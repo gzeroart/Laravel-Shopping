@@ -58,7 +58,7 @@ Route::post('/admin/article/sort/del', 'Admin\ArticleController@sortdelrow');
 //文章管理->分类管理
 Route::get('/admin/article/sort', 'Admin\ArticleController@sort');
 
-1
+
 
 Route::get('/admin', function () {
     echo "string1";
