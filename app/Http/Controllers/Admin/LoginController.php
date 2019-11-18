@@ -33,6 +33,8 @@ class LoginController extends Controller
             if ($name === $user->user_name && md5($passwd) === $user->pwd) {
                 //保存登录成功状态
                 $request->session()->put('isLogin', true);
+                //保存登录者账号
+                $request->session()->put('isUsername', $name);
                 $data['code'] = 200;
                 $data['msg'] = '登录成功';
                 //$data['sit'] = $request->session()->get('isLogin');

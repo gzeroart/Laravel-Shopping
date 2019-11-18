@@ -11,21 +11,6 @@
 |
 */
 
-// 进入调查问卷页面
-Route::get("/survey", "SurveyController@paper");
-
-// 提交问卷
-Route::post("/finish", "SurveyController@finish");
-
-Route::get('/', function () {
-    echo "string";
-});
-
-Route::get("/2", "ProductCategoryController@select2");
-Route::get("/3", "ProductCategoryController@finish2");
-
-Route::get('/co', "ProductCategoryController@testBasicExample");
-
 ##############################后台登录#####################################
 //登录验证
 Route::post('/admin/logchect', "Admin\LoginController@userlogin");
@@ -56,12 +41,16 @@ Route::get('/admin/user/{id}', "Admin\UserController@oneUser");
 Route::post('/admin/article/sort/del', 'Admin\ArticleController@sortdelrow');
 //文章管理->分类管理->修改分类
 Route::post('/admin/article/sort/mod', 'Admin\ArticleController@sortmodrow');
+//文章管理->分类管理->添加分类
+Route::post('/admin/article/sort/add', 'Admin\ArticleController@sortaddrow');
+//文章管理->分类管理->查询分类
+Route::post('/admin/article/sort/qus', 'Admin\ArticleController@sortqusrow');
 
 //文章管理->分类管理
 Route::get('/admin/article/sort', 'Admin\ArticleController@sort');
 
-
+##############################评论管理#####################################
 
 Route::get('/admin', function () {
-    echo "string1";
+    echo "string";
 });

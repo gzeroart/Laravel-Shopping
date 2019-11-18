@@ -210,13 +210,13 @@
                     <el-form-item label="更新时间" required>
                         <el-col :span="11">
                             <el-form-item prop="date1">
-                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date1"></el-date-picker>
+                                <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd" v-model="ruleForm.date1"></el-date-picker>
                             </el-form-item>
                         </el-col>
                         <el-col :span="2" style="text-align: center;">至</el-col>
                         <el-col :span="11">
                             <el-form-item prop="date2">
-                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date2"></el-date-picker>
+                                <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd" v-model="ruleForm.date2"></el-date-picker>
                             </el-form-item>
                         </el-col>
                     </el-form-item>
@@ -226,7 +226,7 @@
                         </el-col>
                     </el-form-item>
                     <el-form-item>
-                        <el-button type="primary">查询</el-button>
+                        <el-button type="primary" @click="queryInfo">查询</el-button>
                         <el-button type="info" @click="resetForm('ruleForm')">重置</el-button>
                         <el-button type="primary" @click="open">新增</el-button>
                     </el-form-item>
@@ -292,6 +292,41 @@
 
             },
             methods: {
+                queryInfo() {
+                    $.ajax({
+                        type: "post",
+                        url: "sort/qus",
+                        dataType: "json",
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data: sort.ruleForm,
+                        success: function(data) {
+                            console.log(data);
+                            if (data.code == 200) {
+                                sort.$message({
+                                    message: data.msg,
+                                    type: 'success',
+                                    duration: 1500,
+                                });
+                            } else {
+                                sort.$message({
+                                    message: data.msg,
+                                    type: 'warning',
+                                    duration: 1500
+                                });
+                            }
+                            sort.tableData = data.data;
+                        },
+                        error: function(XMLResponse) {
+                            sort.$message.error({
+                                message: '服务器连接失败',
+                                duration: 2000
+                            });
+                        }
+                    });
+
+                },
                 //侧边栏
                 handleOpen(key, keyPath) {
                     //console.log(key, keyPath);
@@ -342,13 +377,11 @@
                             },
                             success: function(data) {
                                 if (data.code == 200) {
+                                    rows.splice(index, 1);
                                     sort.$message({
                                         message: data.msg,
                                         type: 'success',
                                         duration: 1500,
-                                        onClose: function() {
-                                            rows.splice(index, 1);
-                                        }
                                     });
                                 } else {
                                     sort.$message({
@@ -374,54 +407,27 @@
                     this.$prompt('分类名', '修改/新增', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-
                         inputErrorMessage: '分类名不能为空'
                     }).then(({
                         value
                     }) => {
-                        this.$message({
-                            type: 'success',
-                            message: '你的分类名: ' + value
-                        });
-                    }).catch(() => {
-                        this.$message({
-                            type: 'info',
-                            message: '取消输入'
-                        });
-                    });
-                },
-                //编辑
-                open2() {
-                    this.$prompt('分类名', '修改分类名', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        inputErrorMessage: '分类名不能为空',
-                        message: '23112312312'
-                    }).then(({
-                        value
-
-                    }) => {
                         $.ajax({
                             type: "post",
-                            url: "sort/mod",
-                            //dataType: "json",
+                            url: "sort/add",
+                            dataType: "json",
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
                             data: {
-                                content: value,
-                                id: _this.edit
+                                content: value
                             },
                             success: function(data) {
-                                console.log(data);
                                 if (data.code == 200) {
+                                    sort.tableData = data.data;
                                     sort.$message({
                                         message: data.msg,
                                         type: 'success',
                                         duration: 1500,
-                                        onClose: function() {
-                                            rows.splice(index, 1);
-                                        }
                                     });
                                 } else {
                                     sort.$message({
@@ -438,14 +444,64 @@
                                 });
                             }
                         });
+                    }).catch(() => {
                         this.$message({
-                            type: 'success',
-                            message: '你的分类名: ' + value
+                            type: 'info',
+                            message: '取消输入'
+                        });
+                    });
+                },
+                //编辑
+                open2(_this) {
+                    this.$prompt('分类名', '修改分类名', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        inputErrorMessage: '分类名不能为空',
+                        inputValue: _this.date /* inputValue 输入框的初始文本 */
+                    }).then(({
+                        value
+                    }) => {
+                        $.ajax({
+                            type: "post",
+                            url: "sort/mod",
+                            dataType: "json",
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            data: {
+                                content: value,
+                                id: _this.edit
+                            },
+                            success: function(data) {
+                                //console.log(data);
+                                if (data.code == 200) {
+                                    _this.date = value;
+                                    _this.province = data.time;
+                                    sort.$message({
+                                        message: data.msg,
+                                        type: 'success',
+                                        duration: 1500,
+                                    });
+                                } else {
+                                    sort.$message({
+                                        message: data.msg,
+                                        type: 'warning',
+                                        duration: 1500
+                                    });
+                                }
+                            },
+                            error: function(XMLResponse) {
+                                sort.$message.error({
+                                    message: '服务器连接失败',
+                                    duration: 2000
+                                });
+                            }
                         });
                     }).catch(() => {
                         this.$message({
                             type: 'info',
-                            message: '取消编辑'
+                            message: '取消编辑',
+                            duration: 1000
                         });
                     });
                 }
