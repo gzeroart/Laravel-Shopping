@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
+
 class ArticleController extends Controller
 {
     public function sort()
     {
-        $users = DB::table('article_category')->get();
+        //->orderBy排序 update_time条件 desc 降序
+        $users = DB::table('article_category')->orderBy('update_time', 'desc')->get();
         //dump($users);
         //定义一个为空的数组
         $us = array();
@@ -27,10 +29,33 @@ class ArticleController extends Controller
         return view('sort', ['us' => $us]);
     }
 
-    public function sortdelrow(Requset $request)
+    //删除分类
+    public function sortdelrow(Request $request)
     {
-        echo 'ee';
-        // $userid = $request->id;
-        // dump($userid);
+        //获取指定ID参数
+        $userid = $request->id;
+        $_sql = "delete from article_category where category_id=" . $userid;
+        //执行删除操作
+        $user = DB::delete($_sql);
+        //如果删除操作返回结果大于等于0则删除成功
+        if ($user >= 0) {
+            $data['code'] = 200;
+            $data['msg'] = '删除成功';
+            echo json_encode($data);
+        } else {
+            $data['code'] = 204;
+            $data['msg'] = '删除失败';
+            echo json_encode($data);
+        }
+    }
+
+    //修改分类
+    public function  sortmodrow(Request $request)
+    {
+        $userid = $request->id;
+        $content = $request->content;
+        $_sql = "update article_category set category_name = ? where category_id = ?";
+        $user = DB::update($_sql, [$userid, $content]);
+        dump($user);
     }
 }

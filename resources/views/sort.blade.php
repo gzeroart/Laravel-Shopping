@@ -243,7 +243,7 @@
 
                     <el-table-column prop="edit" label="操作" width="200">
                         <template slot-scope="scope">
-                            <el-button type="primary" @click="open2" size="small">编辑</el-button>
+                            <el-button type="primary" @click="open2(scope.row)" size="small">编辑</el-button>
                             <el-button type="warning" @click.native.prevent="deleteRow(scope.$index, tableData,scope.row)" size="small">删除</el-button>
                         </template>
                     </el-table-column>
@@ -332,8 +332,8 @@
                     }).then(() => {
                         $.ajax({
                             type: "post",
-                            url: "../sort/del",
-                            //dataType: "json",
+                            url: "sort/del",
+                            dataType: "json",
                             headers: {
                                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                             },
@@ -341,15 +341,18 @@
                                 id: _this.edit
                             },
                             success: function(data) {
-                                if (datalen != 0) {
+                                if (data.code == 200) {
                                     sort.$message({
-                                        message: data,
+                                        message: data.msg,
                                         type: 'success',
-                                        duration: 1500
+                                        duration: 1500,
+                                        onClose: function() {
+                                            rows.splice(index, 1);
+                                        }
                                     });
                                 } else {
                                     sort.$message({
-                                        message: data,
+                                        message: data.msg,
                                         type: 'warning',
                                         duration: 1500
                                     });
@@ -362,19 +365,9 @@
                                 });
                             }
                         });
-                        //rows.splice(index, 1);
-                        // this.$message({
-                        //     type: 'success',
-                        //     message: '删除成功!',
-                        //     duration: 1500
-                        // });
                     }).catch(() => {
 
                     });
-                    // scope.row
-                    console.log(_this.edit);
-                    //移除行
-                    //rows.splice(index, 1);
                 },
                 //新增
                 open() {
@@ -399,14 +392,52 @@
                 },
                 //编辑
                 open2() {
-                    this.$prompt('分类名', '修改/新增', {
+                    this.$prompt('分类名', '修改分类名', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',
-
-                        inputErrorMessage: '分类名不能为空'
+                        inputErrorMessage: '分类名不能为空',
+                        message: '23112312312'
                     }).then(({
                         value
+
                     }) => {
+                        $.ajax({
+                            type: "post",
+                            url: "sort/mod",
+                            //dataType: "json",
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            data: {
+                                content: value,
+                                id: _this.edit
+                            },
+                            success: function(data) {
+                                console.log(data);
+                                if (data.code == 200) {
+                                    sort.$message({
+                                        message: data.msg,
+                                        type: 'success',
+                                        duration: 1500,
+                                        onClose: function() {
+                                            rows.splice(index, 1);
+                                        }
+                                    });
+                                } else {
+                                    sort.$message({
+                                        message: data.msg,
+                                        type: 'warning',
+                                        duration: 1500
+                                    });
+                                }
+                            },
+                            error: function(XMLResponse) {
+                                sort.$message.error({
+                                    message: '服务器连接失败',
+                                    duration: 2000
+                                });
+                            }
+                        });
                         this.$message({
                             type: 'success',
                             message: '你的分类名: ' + value
@@ -414,7 +445,7 @@
                     }).catch(() => {
                         this.$message({
                             type: 'info',
-                            message: '取消输入'
+                            message: '取消编辑'
                         });
                     });
                 }

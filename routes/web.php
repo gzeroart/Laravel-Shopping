@@ -54,6 +54,8 @@ Route::get('/admin/user/{id}', "Admin\UserController@oneUser");
 
 //文章管理->分类管理->删除分类
 Route::post('/admin/article/sort/del', 'Admin\ArticleController@sortdelrow');
+//文章管理->分类管理->修改分类
+Route::post('/admin/article/sort/mod', 'Admin\ArticleController@sortmodrow');
 
 //文章管理->分类管理
 Route::get('/admin/article/sort', 'Admin\ArticleController@sort');
