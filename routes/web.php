@@ -52,7 +52,7 @@ Route::get('/admin/article/sort', 'Admin\ArticleController@sort');
 ##############################评论管理#####################################
 
 //评论管理->评论管理
-Route::get('/admin/comment', 'Admin\ArticleController@comment');
+Route::get('/admin/comment', 'Admin\CommentController@comment');
 
 Route::get('/admin', function () {
     echo "string";
