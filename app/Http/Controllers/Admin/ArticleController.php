@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class ArticleController extends Controller
 {
-    //文章分类
+    //文章分类1
     public function sort()
     {
         //->orderBy排序 update_time条件 desc 降序
