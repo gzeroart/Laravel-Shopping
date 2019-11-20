@@ -13,6 +13,7 @@
 
 ##############################后台登录#####################################
 //登录验证
+
 Route::post('/admin/logchect', "Admin\LoginController@userlogin");
 
 //登录页面
@@ -38,16 +39,16 @@ Route::get('/admin/user/{id}', "Admin\UserController@oneUser");
 ##############################文章管理#####################################
 
 //文章管理->分类管理->删除分类
-Route::post('/admin/article/sort/del', 'Admin\ArticleController@sortdelrow');
+Route::post('/admin/sort/del', 'Admin\ArticleController@sortdelrow');
 //文章管理->分类管理->修改分类
-Route::post('/admin/article/sort/mod', 'Admin\ArticleController@sortmodrow');
+Route::post('/admin/sort/mod', 'Admin\ArticleController@sortmodrow');
 //文章管理->分类管理->添加分类
-Route::post('/admin/article/sort/add', 'Admin\ArticleController@sortaddrow');
+Route::post('/admin/sort/add', 'Admin\ArticleController@sortaddrow');
 //文章管理->分类管理->查询分类
-Route::post('/admin/article/sort/qus', 'Admin\ArticleController@sortqusrow');
+Route::post('/admin/sort/qus', 'Admin\ArticleController@sortqusrow');
 
 //文章管理->分类管理
-Route::get('/admin/article/sort', 'Admin\ArticleController@sort');
+Route::get('/admin/articlesort', 'Admin\ArticleController@sort');
 
 ##############################评论管理#####################################
 
@@ -55,5 +56,15 @@ Route::get('/admin/article/sort', 'Admin\ArticleController@sort');
 Route::get('/admin/comment', 'Admin\CommentController@comment');
 
 Route::get('/admin', function () {
-    echo "string";
+    //跳转redirect
+    $isLogin = session()->get('isLogin'); //登录标识
+    if ($isLogin) {
+        echo '这是后台首页';
+    } else {
+        return redirect('../admin/login');
+    }
+});
+
+Route::get('/', function () {
+    echo "这是首页";
 });

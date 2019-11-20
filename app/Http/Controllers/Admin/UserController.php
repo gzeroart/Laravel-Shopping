@@ -29,7 +29,7 @@ class UserController extends Controller
                 "edit" => $user->id //ID
             ));
         }
-        return view('user', ['us' => $us]);
+        return view('user', ['us' => $us, 'pageOn' => 'user']);
     }
 
     //判断用户等级
