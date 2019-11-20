@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>评论管理</title>
+    <title>文章管理-文章管理</title>
     <link rel="stylesheet" href="{{asset('asset/admin/element-ui/lib/theme-chalk/index.css')}}">
     <script src="{{asset('asset/admin/vue/vue.js')}}"></script>
     <script src="{{asset('asset/admin/element-ui/lib/index.js')}}"></script>
@@ -155,67 +155,65 @@
         <div class="main">
             <div class="main-form">
                 <el-form :model="ruleForm" ref="ruleForm" label-width="130px" class="demo-ruleForm">
-
-                    <el-form-item label="商品名" prop="name">
+                    <el-form-item label="标题" prop="name">
                         <el-col :span="11">
-                            <el-input placeholder="请输入商品名" v-model="ruleForm.name"></el-input>
+                            <el-input placeholder="请输入标题" v-model="ruleForm.name"></el-input>
                         </el-col>
+
+                        <el-form-item label="文章分类" prop="article">
+                            <el-col :span="11">
+                                <el-input placeholder="请输入文章分类" v-model="ruleForm.article"></el-input>
+                            </el-col>
+                        </el-form-item>
                     </el-form-item>
 
 
-                    <el-form-item label="开始时间" required>
+                    <el-form-item label="更新时间" required>
                         <el-col :span="11">
                             <el-form-item prop="date1">
-                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date1">
-                                </el-date-picker>
+                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date1"></el-date-picker>
                             </el-form-item>
                         </el-col>
                         <el-col :span="2" style="text-align: center;">至</el-col>
                         <el-col :span="11">
                             <el-form-item prop="date2">
-                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date2">
-                                </el-date-picker>
+                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date2"></el-date-picker>
                             </el-form-item>
                         </el-col>
                     </el-form-item>
 
                     <el-form-item>
-                        <el-button type="success">查询</el-button>
-                        <el-button type="success" @click="resetForm('ruleForm')">重置</el-button>
-                        <el-button type="success">全部通过</el-button>
-                        <el-button type="success">全部驳回</el-button>
-                        <el-button type="success">全部删除</el-button>
+                        <el-button type="primary">查询</el-button>
+                        <el-button type="info" @click="resetForm('ruleForm')">重置</el-button>
+                        <el-button type="primary">新增</el-button>
                     </el-form-item>
                 </el-form>
             </div>
             <div class="main-table">
                 <el-table :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)" border>
-                    <el-table-column type="selection" width="55"></el-table-column>
-                    <el-table-column fixed prop="name" label="用户名" width="200">
+                    <el-table-column fixed prop="title" label="标题" width="200">
                     </el-table-column>
-                    <el-table-column fixed prop="tradeName" label="商品名" width="200">
+                    <el-table-column fixed prop="date" label="分类名" width="200">
                     </el-table-column>
-                    <el-table-column prop="content" label="内容">
+                    <el-table-column prop="province" label="最后更新时间">
                     </el-table-column>
-                    <el-table-column prop="StarRated" label="评论星级" width="200">
-                    </el-table-column>
-                    <el-table-column prop="time" label="创建时间" width="200">
-                    </el-table-column>
-                    <el-table-column prop="state" label="审核状态" width="200">
+                    <el-table-column prop="name" label="更新者名" width="200">
                     </el-table-column>
 
-                    <el-table-column prop="operation" label="操作" width="300">
+                    <el-table-column prop="edit" label="操作" width="200">
                         <template slot-scope="scope">
-                            <el-button type="primary" size="small">通过</el-button>
-                            <el-button type="primary" size="small">驳回</el-button>
+                            <el-button type="primary" @click="open2" size="small">编辑</el-button>
                             <el-button type="warning" @click.native.prevent="deleteRow(scope.$index, tableData)" size="small">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
                 <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 30, 40, 50]" :page-size="pagesize" :total="tableData.length" layout="total, sizes, prev, pager, next, jumper">
                 </el-pagination>
+
             </div>
         </div>
+
+
     </div>
     <script src="{{asset('asset/admin/jquery3-4-1/jquery.min.js')}}"></script>
     <script>
@@ -231,27 +229,26 @@
                     },
                     value: '',
                     ruleForm: {
-                        name: '', //商品名
+                        name: '', //标题
+                        article: '', //文章分类
                         date1: '', //更新时间  开始
                         date2: '', //更新时间  结束
-
+                        delivery: false,
+                        type: [],
                     },
 
                     tableData: [
                         @foreach($us as $key => $dat) {
-                            id: "{{$dat['id']}}", //ID
-                            name: "{{$dat['name']}}", //用户名
-                            tradeName: "{{$dat['tradeName']}}", //商品名
-                            content: '{{$dat["content"]}}', //内容
-                            StarRated: "{{$dat['StarRated']}}", //评论星级
-                            time: "{{$dat['time']}}", //创建时间
-                            state: "{{$dat['state']}}", //审核状态
+                            id: "{{$dat['id']}}",
+                            title: '{{$dat["title"]}}', //标题
+                            date: '{{$dat["date"]}}', //分类名
+                            name: '{{$dat["name"]}}', //更新者名
+                            province: '{{$dat["province"]}}', //最后更新时间
                         },
                         @endforeach
                     ],
                     currentPage: 1,
-                    pagesize: 10,
-                    multipleSelection: []
+                    pagesize: 10
                 };
 
             },

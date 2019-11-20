@@ -49,11 +49,15 @@ Route::post('/admin/sort/qus', 'Admin\ArticleController@sortqusrow');
 
 //文章管理->分类管理
 Route::get('/admin/articlesort', 'Admin\ArticleController@sort');
-
+//文章管理->文章管理
+Route::get('/admin/articlemanage', 'Admin\ArticleController@manage');
 ##############################评论管理#####################################
 
 //评论管理->评论管理
 Route::get('/admin/comment', 'Admin\CommentController@comment');
+
+
+
 
 Route::get('/admin', function () {
     //跳转redirect

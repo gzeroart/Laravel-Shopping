@@ -9,7 +9,30 @@ use Illuminate\Support\Facades\DB;
 
 class ArticleController extends Controller
 {
-    //文章分类1
+    //文章管理
+    public function manage()
+    {
+        //AS自定一字段别名 a.category = ac.category_id文章表链接分类记录表id
+        $_sql = "SELECT a.id AS id,a.content AS content,a.category AS category, a.update_time AS updateTime,a.update_user_id AS updateUserId,a.title AS title , ac.category_name AS articleCategoryName FROM article a LEFT JOIN article_category ac ON a.category = ac.category_id 
+        ";
+        $users = DB::select($_sql);
+        //定义一个为空的数组
+        $us = array();
+        foreach ($users as $k => $user) {
+            //合并数组
+            array_push($us, array(
+                "id" => $user->id, //ID
+                "title" => $user->title, //标题
+                "name" => $user->updateUserId, //更新者名
+                "date" => $user->articleCategoryName, //分类名
+                "province" => $user->updateTime //最后更新时间
+            ));
+        }
+        return view('manage', ['us' => $us, 'pageOn' => 'articlemanage']);
+    }
+
+
+    //文章分类
     public function sort()
     {
         //->orderBy排序 update_time条件 desc 降序

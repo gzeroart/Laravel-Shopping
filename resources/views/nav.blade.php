@@ -37,14 +37,14 @@
                 <i class="el-icon-s-comment"></i>
                 <span slot="title">评论管理</span>
             </el-menu-item>
-            <el-submenu index="5">
+            <el-submenu index="3">
                 <template slot="title"> <i class="el-icon-document-copy"></i><span>文章管理</span></template>
                 <el-menu-item-group>
                     <el-menu-item index="articlesort" @click="navJump('articlesort')">分类管理</el-menu-item>
-                    <el-menu-item index="5-2">文章管理</el-menu-item>
+                    <el-menu-item index="articlemanage" @click="navJump('articlemanage')">文章管理</el-menu-item>
                 </el-menu-item-group>
             </el-submenu>
-            <el-menu-item index="6" :default-active="aaaa">
+            <el-menu-item index="6">
                 <i class="el-icon-collection"></i>
                 <span slot="title">电子钱包初始金额设定</span>
             </el-menu-item>

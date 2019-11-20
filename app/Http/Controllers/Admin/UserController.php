@@ -144,7 +144,7 @@ class UserController extends Controller
             $userid2 = $user->id;
         }
         //dump($user);
-        return view('useredit', ['usertitle' => $usertitle, 'username' => $username, 'useremail' => $useremail, 'userrole' => $userrole, 'userid' => $userid2]);
+        return view('useredit', ['usertitle' => $usertitle, 'username' => $username, 'useremail' => $useremail, 'userrole' => $userrole, 'userid' => $userid2, 'pageOn' => 'user']);
     }
 
     //用户信息修改
@@ -181,7 +181,7 @@ class UserController extends Controller
     //添加用户
     public function addUser()
     {
-        return view('useradd');
+        return view('useradd', ['pageOn' => 'user']);
     }
 
     //添加新用户
