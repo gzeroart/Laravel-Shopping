@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\DB;
 
 class ArticleController extends Controller
 {
+    //文章分类
     public function sort()
     {
         //->orderBy排序 update_time条件 desc 降序
@@ -28,7 +29,7 @@ class ArticleController extends Controller
         }
         //获取登录者账号
         $isusername = session()->get('isUsername');
-        return view('sort', ['us' => $us]);
+        return view('sort', ['us' => $us, 'pageOn' => 'articlesort']);
     }
 
     //删除分类
