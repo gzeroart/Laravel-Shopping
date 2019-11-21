@@ -143,6 +143,11 @@
         padding: 20px;
         margin-top: 20px;
     }
+
+    .el-date-editor.el-input,
+    .el-date-editor.el-input__inner {
+        width: 100%;
+    }
 </style>
 
 <body>
@@ -169,6 +174,7 @@
                                 <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd" v-model="ruleForm.registerTimeForm"></el-date-picker>
                             </el-form-item>
                         </el-col>
+                        <el-col :span="1" style="text-align: center;">-</el-col>
                         <el-col :span="5">
                             <el-form-item prop="registerTimeTo">
                                 <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd" v-model="ruleForm.registerTimeTo"></el-date-picker>
@@ -181,7 +187,7 @@
                                 <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd" v-model="ruleForm.lastLoginTimeForm"></el-date-picker>
                             </el-form-item>
                         </el-col>
-
+                        <el-col :span="1" style="text-align: center;">-</el-col>
                         <el-col :span="5">
                             <el-form-item prop="lastLoginTimeTo">
                                 <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd" v-model="ruleForm.lastLoginTimeTo"></el-date-picker>

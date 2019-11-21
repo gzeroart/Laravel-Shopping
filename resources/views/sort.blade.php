@@ -310,6 +310,7 @@
                     this.currentPage = currentPage;
                 },
                 deleteRow(index, rows, _this) {
+                    console.log(rows);
                     this.$confirm('是否删除此分类？', '提示', {
                         confirmButtonText: '确定',
                         cancelButtonText: '取消',

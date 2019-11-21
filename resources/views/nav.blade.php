@@ -17,14 +17,14 @@
                 <template slot="title"> <i class="el-icon-goods"></i><span>商品管理</span></template>
                 <el-menu-item-group>
                     <el-menu-item index="1-1">商品分类管理</el-menu-item>
-                    <el-menu-item index="1-2">商品管理</el-menu-item>
-                    <el-menu-item index="1-3">Option管理</el-menu-item>
+                    <el-menu-item index="productList" @click="navJump('productList')">商品管理</el-menu-item>
+                    <el-menu-item index="option" @click="navJump('option')">Option管理</el-menu-item>
                 </el-menu-item-group>
             </el-submenu>
-            <el-submenu index="2">
+            <el-submenu index=" 2">
                 <template slot="title"> <i class="el-icon-document"></i> <span slot="title">订单管理</span></template>
                 <el-menu-item-group>
-                    <el-menu-item index="2-1">查看订单</el-menu-item>
+                    <el-menu-item index="order" @click="navJump('order')">查看订单</el-menu-item>
                 </el-menu-item-group>
             </el-submenu>
             <!-- style="color: rgb(255, 208, 75);" -->
@@ -44,7 +44,7 @@
                     <el-menu-item index="articlemanage" @click="navJump('articlemanage')">文章管理</el-menu-item>
                 </el-menu-item-group>
             </el-submenu>
-            <el-menu-item index="6">
+            <el-menu-item index="pay" @click="navJump('pay')">
                 <i class="el-icon-collection"></i>
                 <span slot="title">电子钱包初始金额设定</span>
             </el-menu-item>

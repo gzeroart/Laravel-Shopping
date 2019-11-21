@@ -6,10 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>文章管理-文章管理</title>
+    <title>商品管理——商品管理</title>
     <link rel="stylesheet" href="{{asset('asset/admin/element-ui/lib/theme-chalk/index.css')}}">
     <script src="{{asset('asset/admin/vue/vue.js')}}"></script>
     <script src="{{asset('asset/admin/element-ui/lib/index.js')}}"></script>
+
 </head>
 <style>
     * {
@@ -155,91 +156,146 @@
         <!-- 主体内容 -->
         <div class="main">
             <div class="main-form">
-                <el-form :model="ruleForm" ref="ruleForm" label-width="130px" class="demo-ruleForm">
-                    <el-form-item label-width="0">
-                        <el-form-item label="标题" prop="name">
-                            <el-col :span="11">
-                                <el-input placeholder="请输入标题" v-model="ruleForm.name"></el-input>
-                            </el-col>
+                <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="130px" class="demo-ruleForm">
 
-                            <el-form-item label="文章分类" prop="article" label-width="100px">
-                                <el-col :span="11">
-                                    <el-input placeholder="请输入文章分类" v-model="ruleForm.article"></el-input>
-                                </el-col>
-                            </el-form-item>
-                        </el-form-item>
+                    <el-form-item label="商品名" prop="username">
+                        <el-col :span="13">
+                            <el-input placeholder="请输入商品名" v-model="ruleForm.username"></el-input>
+                        </el-col>
                     </el-form-item>
-                    <el-form-item label="更新时间" required>
-                        <el-col :span="11">
-                            <el-form-item prop="date1">
-                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date1"></el-date-picker>
+                    <el-form-item label="热门商品" prop="tradeName">
+                        <el-radio-group v-model="ruleForm.tradeName">
+                            <el-radio :label="3">全部</el-radio>
+                            <el-radio :label="6">热门商品</el-radio>
+                            <el-radio :label="9">非热门商品</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+                    <el-form-item label-width="0px">
+                        <el-col :span="7">
+                            <el-form-item label="商品分类" prop="role">
+                                <el-select v-model="ruleForm.role" placeholder="请选择状态">
+                                    <el-option label="全部" value="all"></el-option>
+                                    <el-option label="水果类" value="ROLE_ADMIN"></el-option>
+                                    <el-option label="蔬菜蛋类" value="ROLE_USER"></el-option>
+                                    <el-option label="肉禽类" value="ROLE_ADMIN"></el-option>
+                                    <el-option label="水果类" value="ROLE_ADMIN"></el-option>
+                                    <el-option label="测试分类" value="ROLE_USER"></el-option>
+                                    <el-option label="男装" value="ROLE_ADMIN"></el-option>
+                                    <el-option label="女装" value="ROLE_ADMIN"></el-option>
+                                    <el-option label="童装" value="ROLE_USER"></el-option>
+                                    <el-option label="运动鞋类" value="ROLE_ADMIN"></el-option>
+                                    <el-option label="休闲类" value="ROLE_ADMIN"></el-option>
+                                    <el-option label="家电" value="ROLE_USER"></el-option>
+                                    <el-option label="家居" value="ROLE_ADMIN"></el-option>
+                                    <el-option label="鞋帽类" value="ROLE_ADMIN"></el-option>
+                                    <el-option label="电子类" value="ROLE_USER"></el-option>
+                                    <el-option label="软件类" value="ROLE_ADMIN"></el-option>
+                                    <el-option label="电脑类" value="ROLE_USER"></el-option>
+                                    <el-option label="家电类" value="ROLE_ADMIN"></el-option>
+                                </el-select>
                             </el-form-item>
                         </el-col>
-                        <el-col :span="2" style="text-align: center;">至</el-col>
-                        <el-col :span="11">
-                            <el-form-item prop="date2">
-                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date2"></el-date-picker>
+                        <el-col :span="7">
+                            <el-form-item label="状态" prop="enabled" label-width="80px">
+                                <el-select v-model="ruleForm.enabled" placeholder="请选择状态">
+                                    <el-option label="全部" value="all"></el-option>
+                                    <el-option label="已上架" value="1"></el-option>
+                                    <el-option label="已下架" value="0"></el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                    </el-form-item>
+
+                    <el-form-item label="下单时间">
+                        <el-col :span="6">
+                            <el-form-item prop="lastLoginTimeForm">
+                                <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd" v-model="ruleForm.lastLoginTimeForm"></el-date-picker>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="1" style="text-align: center;">至</el-col>
+                        <el-col :span="6">
+                            <el-form-item prop="lastLoginTimeTo">
+                                <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd" v-model="ruleForm.lastLoginTimeTo"></el-date-picker>
                             </el-form-item>
                         </el-col>
                     </el-form-item>
 
                     <el-form-item>
-                        <el-button type="primary" @click="queryInfo()">查询</el-button>
-                        <el-button type="info" @click="resetForm('ruleForm')">重置</el-button>
-                        <el-button type="primary">新增</el-button>
+                        <el-button type="primary">添加</el-button>
+                        <el-button type="primary" @click="queryInfo">查询</el-button>
+                        <el-button @click="resetForm('ruleForm')">重置</el-button>
                     </el-form-item>
                 </el-form>
             </div>
             <div class="main-table">
                 <el-table :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)" border>
-                    <el-table-column fixed prop="title" label="标题" width="200">
+                    <el-table-column fixed prop="username" label="商品名" width="150">
                     </el-table-column>
-                    <el-table-column fixed prop="date" label="分类名" width="200">
+                    <el-table-column prop="nickname" label="商品分类" width="150">
                     </el-table-column>
-                    <el-table-column prop="province" label="最后更新时间">
+                    <el-table-column prop="email" label="商品概要说明">
                     </el-table-column>
-                    <el-table-column prop="name" label="更新者名" width="200">
+                    <el-table-column prop="enabled" label="店内价格" width="130">
                     </el-table-column>
-
-                    <el-table-column prop="edit" label="操作" width="200">
+                    <el-table-column prop="role" label="市场价格" width="150">
+                    </el-table-column>
+                    <el-table-column prop="lastLoginTime" label="数量" width="100">
+                    </el-table-column>
+                    <el-table-column prop="popular" label="热门商品" width="150">
+                    </el-table-column>
+                    <el-table-column prop="state" label="状态" width="120">
+                    </el-table-column>
+                    <el-table-column prop="registerTime" label="更新时间" width="250">
+                    </el-table-column>
+                    <el-table-column prop="edit" label="操作" width="96">
                         <template slot-scope="scope">
-                            <el-button type="primary" @click="" size="small">编辑</el-button>
-                            <el-button type="warning" @click.native.prevent="deleteRow(scope.$index, tableData,scope.row)" size="small">删除</el-button>
+                            <el-button @click="userEdit(scope.row)">查看</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
                 <el-pagination @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="currentPage" :page-sizes="[10, 20, 30, 40, 50]" :page-size="pagesize" :total="tableData.length" layout="total, sizes, prev, pager, next, jumper">
                 </el-pagination>
-
             </div>
         </div>
-
-
     </div>
     <script src="{{asset('asset/admin/jquery3-4-1/jquery.min.js')}}"></script>
+
     <script>
-        const manage = new Vue({
+        const user = new Vue({
             el: '#app',
             data() {
                 return {
-                    collapse: false,
                     value: '',
                     ruleForm: {
-                        name: '', //标题
-                        article: '', //文章分类
-                        date1: '', //更新时间  开始
-                        date2: '', //更新时间  结束
+                        username: '', //商品名
+                        role: 'all', //商品分类
+                        lastLoginTimeForm: '', //下单开始时间
+                        lastLoginTimeTo: '', //下单结束时间
+                        enabled: 'all', //状态
+                        tradeName: '', //热门商品
                         delivery: false,
                         type: [],
                     },
-
+                    rules: {
+                        region: [{
+                            required: true,
+                            message: '请选择',
+                            trigger: 'change'
+                        }],
+                    },
+                    pageOn: '{{$pageOn}}',
                     tableData: [
                         @foreach($us as $key => $dat) {
-                            id: "{{$dat['id']}}",
-                            title: '{{$dat["title"]}}', //标题
-                            date: '{{$dat["date"]}}', //分类名
-                            name: '{{$dat["name"]}}', //更新者名
-                            province: '{{$dat["province"]}}', //最后更新时间
+                            username: "{{$dat['username']}}", //商品名
+                            nickname: "{{$dat['nickname']}}", //商品分类
+                            email: "{{$dat['email']}}", //商品概要说明
+                            enabled: "{{$dat['enabled']}}", //店内价格
+                            role: "{{$dat['role']}}", //市场价格
+                            lastLoginTime: "{{$dat['lastLoginTime']}}", //数量
+                            popular: "{{$dat['lastLoginTime']}}" //热门商品
+                            state: "{{$dat['lastLoginTime']}}" //状态
+                            registerTime: "{{$dat['registerTime']}}", //更新时间
+                            edit: "{{$dat['edit']}}", //查看
                         },
                         @endforeach
                     ],
@@ -249,51 +305,54 @@
 
             },
             methods: {
+
+                userEdit(_this) {
+                    window.location = './user/' + _this.edit;
+                },
                 queryInfo() {
                     $.ajax({
                         type: "post",
-                        url: "manage/qus",
+                        url: "quserInfo",
                         dataType: "json",
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
-                        data: manage.ruleForm,
+                        data: {
+                            username: user.ruleForm.username,
+                            role: user.ruleForm.role,
+                            registerTimeForm: user.ruleForm.registerTimeForm,
+                            registerTimeTo: user.ruleForm.registerTimeTo,
+                            lastLoginTimeForm: user.ruleForm.lastLoginTimeForm,
+                            lastLoginTimeTo: user.ruleForm.lastLoginTimeTo,
+                            enabled: user.ruleForm.enabled
+                        },
                         success: function(data) {
-                            var datalen = data.data.length;
+                            var datalen = data.length;
                             if (datalen != 0) {
-                                manage.$message({
+                                user.$message({
                                     message: '查询到相关数据' + datalen + '条',
                                     type: 'success',
                                     duration: 3000
                                 });
                             } else {
-                                manage.$message({
+                                user.$message({
                                     message: '无数据',
                                     type: 'warning',
                                     duration: 3000
                                 });
                             }
-                            manage.tableData = data.data;
+                            user.tableData = data;
                         },
                         error: function(XMLResponse) {
-                            manage.$message.error({
+                            user.$message.error({
                                 message: '服务器连接失败',
                                 duration: 2000
                             });
                         }
                     });
                 },
-                //侧边栏
-                handleOpen(key, keyPath) {
-                    //console.log(key, keyPath);
-                },
-                handleClose(key, keyPath) {
-                    // console.log(key, keyPath);
-                },
-                // 侧边栏折叠
-                collapseChage() {
-                    //this.collapse = !this.collapse;
-                },
+
+
                 submitForm(formName) {
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
@@ -304,64 +363,15 @@
                         }
                     });
                 },
-                //重置按钮
+                //重置
                 resetForm(formName) {
                     this.$refs[formName].resetFields();
                 },
-                //分页
                 handleSizeChange: function(val) {
                     this.pagesize = val;
                 },
                 handleCurrentChange: function(currentPage) {
                     this.currentPage = currentPage;
-                },
-                //删除
-                deleteRow(index, rows, _this) {
-
-                    this.$confirm('是否要删除文章?', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                    }).then(() => {
-                        $.ajax({
-                            type: "post",
-                            url: "manage/del",
-                            dataType: "json",
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            data: {
-                                id: _this.id
-                            },
-                            success: function(data) {
-                                if (data.code == 200) {
-                                    rows.splice(index, 1);
-                                    manage.$message({
-                                        message: data.msg,
-                                        type: 'success',
-                                        duration: 3000
-                                    });
-                                } else {
-                                    manage.$message({
-                                        message: data.msg,
-                                        type: 'warning',
-                                        duration: 3000
-                                    });
-                                }
-                            },
-                            error: function(XMLResponse) {
-                                manage.$message.error({
-                                    message: '服务器连接失败',
-                                    duration: 2000
-                                });
-                            }
-                        });
-                    }).catch(() => {
-                        this.$message({
-                            type: 'info',
-                            message: '已取消删除'
-                        });
-                    });
                 },
 
             }

@@ -46,6 +46,10 @@ Route::post('/admin/sort/mod', 'Admin\ArticleController@sortmodrow');
 Route::post('/admin/sort/add', 'Admin\ArticleController@sortaddrow');
 //文章管理->分类管理->查询分类
 Route::post('/admin/sort/qus', 'Admin\ArticleController@sortqusrow');
+//文章管理->文章管理->查询文章
+Route::post('/admin/manage/qus', 'Admin\ArticleController@managequs');
+//文章管理->文章管理->删除文章
+Route::post('/admin/manage/del', 'Admin\ArticleController@managedel');
 
 //文章管理->分类管理
 Route::get('/admin/articlesort', 'Admin\ArticleController@sort');
@@ -53,11 +57,46 @@ Route::get('/admin/articlesort', 'Admin\ArticleController@sort');
 Route::get('/admin/articlemanage', 'Admin\ArticleController@manage');
 ##############################评论管理#####################################
 
+//评论管理->评论查询
+Route::post('/admin/comment/qus', 'Admin\CommentController@query');
+//评论管理->评论审核
+Route::post('/admin/comment/mod', 'Admin\CommentController@adoptrow');
+//评论管理->评论批量审核
+Route::post('/admin/comment/mods', 'Admin\CommentController@adoptall');
+//评论管理->评论批量审核
+Route::post('/admin/comment/del', 'Admin\CommentController@delAll');
+
 //评论管理->评论管理
 Route::get('/admin/comment', 'Admin\CommentController@comment');
 
+##############################订单管理#####################################
+
+//订单管理->订单查询
+Route::post('/admin/order/qus', 'Admin\OrderController@orderinfo');
+
+//订单管理->订单管理
+Route::get('/admin/order', 'Admin\OrderController@orderList');
+Route::get('/admin/111', 'Admin\OrderController@orderrow');
+
+##############################商品管理#####################################
+
+//商品管理->option
+Route::get('/admin/option', function () {
+    $us = array();
+    return view("optioninfo", ['us' => $us, 'pageOn' => 'option']);
+});
 
 
+
+//productList
+//商品管理->商品管理
+Route::get('/admin/productList', function () {
+    $us = array();
+    return view("productList", ['us' => $us, 'pageOn' => 'productList']);
+});
+
+
+##############################商品管理#####################################
 
 Route::get('/admin', function () {
     //跳转redirect
@@ -72,3 +111,14 @@ Route::get('/admin', function () {
 Route::get('/', function () {
     echo "这是首页";
 });
+
+##############################电子钱包#####################################
+
+//评论管理->评论批量审核
+Route::post('/admin/pay/add', 'Admin\PayController@payadd');
+
+//电子钱包->电子钱包
+Route::get('/admin/pay', 'Admin\PayController@pay');
+
+
+##############################路由结束#####################################

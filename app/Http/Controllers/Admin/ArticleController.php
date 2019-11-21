@@ -209,4 +209,82 @@ class ArticleController extends Controller
             echo json_encode($data);
         }
     }
+    //文章查询
+    public function managequs(Request $request)
+    {
+        $userid = $request->id;
+        $name = $request->name; //标题
+        $article = $request->article; //文章分类
+        $date1 = $request->date1; //时间开始
+        $date2 = $request->date2; //时间结束
+
+        //判断标题
+        if ($name != '') {
+            $name = " AND a.title LIKE '%" . $name . "%' ESCAPE'|' ";
+        }
+
+        //判断文章分类
+        if ($article != '') {
+            $article = " AND ac.category_name LIKE '%" . $article . "%' ESCAPE'|' ";
+        }
+
+        //判断时间1
+        if ($date1 != '') {
+            $date1 = " AND a.update_time >= '" . $date1 . "' ";
+        }
+
+        if ($date2) {
+            $date2 = " AND a.update_time <= '" . $date2 . "' ";
+        }
+
+        //ESCAPE 关键字定义转义符
+        $_sql = "SELECT a.id as id,a.content as content,a.category as category, a.update_time as updateTime,a.update_user_id as updateUserId,a.title as title , ac.category_name as articleCategoryName FROM article a LEFT JOIN article_category ac ON a.category = ac.category_id WHERE 1=1" . $name . $article . $date1 . $date2;
+
+        //使用SQL原生模式
+        $users = DB::select($_sql);
+        if ($users == null) {
+            //定义一个用于储存的数组'code' => 204, 'msg' => '无数据'
+            $us = array();
+            $data['code'] = 204;
+            $data['msg'] = '查询到相关数据0条';
+            $data['data'] = $us;
+            echo json_encode($data);
+        } else {
+            //定义一个为空的数组
+            $us = array();
+            foreach ($users as $k => $user) {
+                //合并数组
+                array_push($us, array(
+                    "id" => $user->id, //ID
+                    "title" => $user->title, //标题
+                    "name" => $user->updateUserId, //更新者名
+                    "date" => $user->articleCategoryName, //分类名
+                    "province" => $user->updateTime //最后更新时间
+                ));
+            }
+            $data['code'] = 200;
+            $data['msg'] = '查询到相关数据' . count($us) . '条';
+            $data['data'] = $us;
+            echo json_encode($data);
+        }
+    }
+
+    //删除文章
+    public function managedel(Request $request)
+    {
+        $userid = $request->id;
+        $_sql = "delete from article where id = " . $userid;
+        //执行删除操作
+        $user = DB::delete($_sql);
+        //如果删除操作返回结果大于等于0则删除成功
+        if ($user >= 0) {
+            $data['code'] = 200;
+            $data['msg'] = '删除成功';
+            echo json_encode($data);
+        } else {
+            $data['code'] = 204;
+            $data['msg'] = '删除失败';
+            echo json_encode($data);
+        }
+    }
 }

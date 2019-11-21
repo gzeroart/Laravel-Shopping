@@ -5,8 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>文章管理-文章管理</title>
+    <title>商品管理-option管理</title>
     <link rel="stylesheet" href="{{asset('asset/admin/element-ui/lib/theme-chalk/index.css')}}">
     <script src="{{asset('asset/admin/vue/vue.js')}}"></script>
     <script src="{{asset('asset/admin/element-ui/lib/index.js')}}"></script>
@@ -29,7 +28,7 @@
         color: azure;
         position: absolute;
         top: 0;
-        z-index: 1000;
+        z-index: 1111111;
     }
 
     .header h3 {
@@ -156,55 +155,36 @@
         <div class="main">
             <div class="main-form">
                 <el-form :model="ruleForm" ref="ruleForm" label-width="130px" class="demo-ruleForm">
-                    <el-form-item label-width="0">
-                        <el-form-item label="标题" prop="name">
-                            <el-col :span="11">
-                                <el-input placeholder="请输入标题" v-model="ruleForm.name"></el-input>
-                            </el-col>
+                    <el-form-item label="option编号" prop="name">
+                        <el-col :span="11">
+                            <el-input placeholder="请输入option编号" v-model="ruleForm.name"></el-input>
+                        </el-col>
 
-                            <el-form-item label="文章分类" prop="article" label-width="100px">
-                                <el-col :span="11">
-                                    <el-input placeholder="请输入文章分类" v-model="ruleForm.article"></el-input>
-                                </el-col>
-                            </el-form-item>
+                        <el-form-item label="option名称" prop="article">
+                            <el-col :span="11">
+                                <el-input placeholder="请输入文章option名称" v-model="ruleForm.article"></el-input>
+                            </el-col>
                         </el-form-item>
-                    </el-form-item>
-                    <el-form-item label="更新时间" required>
-                        <el-col :span="11">
-                            <el-form-item prop="date1">
-                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date1"></el-date-picker>
-                            </el-form-item>
-                        </el-col>
-                        <el-col :span="2" style="text-align: center;">至</el-col>
-                        <el-col :span="11">
-                            <el-form-item prop="date2">
-                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date2"></el-date-picker>
-                            </el-form-item>
-                        </el-col>
                     </el-form-item>
 
                     <el-form-item>
-                        <el-button type="primary" @click="queryInfo()">查询</el-button>
+                        <el-button type="primary">查询</el-button>
                         <el-button type="info" @click="resetForm('ruleForm')">重置</el-button>
-                        <el-button type="primary">新增</el-button>
+                        <el-button type="primary">添加</el-button>
+                        <el-button type="primary">删除</el-button>
                     </el-form-item>
                 </el-form>
             </div>
             <div class="main-table">
                 <el-table :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)" border>
-                    <el-table-column fixed prop="title" label="标题" width="200">
+                    <el-table-column fixed prop="title" label="标题">
                     </el-table-column>
-                    <el-table-column fixed prop="date" label="分类名" width="200">
+                    <el-table-column fixed prop="date" label="分类名">
                     </el-table-column>
-                    <el-table-column prop="province" label="最后更新时间">
-                    </el-table-column>
-                    <el-table-column prop="name" label="更新者名" width="200">
-                    </el-table-column>
-
-                    <el-table-column prop="edit" label="操作" width="200">
+                    <el-table-column prop="edit" label="操作" width="300">
                         <template slot-scope="scope">
-                            <el-button type="primary" @click="" size="small">编辑</el-button>
-                            <el-button type="warning" @click.native.prevent="deleteRow(scope.$index, tableData,scope.row)" size="small">删除</el-button>
+                            <el-button type="primary" @click="open2" size="small">编辑</el-button>
+                            <el-button type="warning" @click.native.prevent="deleteRow(scope.$index, tableData)" size="small">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -218,28 +198,23 @@
     </div>
     <script src="{{asset('asset/admin/jquery3-4-1/jquery.min.js')}}"></script>
     <script>
-        const manage = new Vue({
+        new Vue({
             el: '#app',
             data() {
                 return {
                     collapse: false,
                     value: '',
                     ruleForm: {
-                        name: '', //标题
-                        article: '', //文章分类
-                        date1: '', //更新时间  开始
-                        date2: '', //更新时间  结束
-                        delivery: false,
+                        name: '', //option编号
+                        article: '', //option名称
                         type: [],
                     },
 
                     tableData: [
                         @foreach($us as $key => $dat) {
                             id: "{{$dat['id']}}",
-                            title: '{{$dat["title"]}}', //标题
-                            date: '{{$dat["date"]}}', //分类名
-                            name: '{{$dat["name"]}}', //更新者名
-                            province: '{{$dat["province"]}}', //最后更新时间
+                            title: '{{$dat["title"]}}', //option编号
+                            date: '{{$dat["date"]}}', //option名称
                         },
                         @endforeach
                     ],
@@ -249,40 +224,6 @@
 
             },
             methods: {
-                queryInfo() {
-                    $.ajax({
-                        type: "post",
-                        url: "manage/qus",
-                        dataType: "json",
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        data: manage.ruleForm,
-                        success: function(data) {
-                            var datalen = data.data.length;
-                            if (datalen != 0) {
-                                manage.$message({
-                                    message: '查询到相关数据' + datalen + '条',
-                                    type: 'success',
-                                    duration: 3000
-                                });
-                            } else {
-                                manage.$message({
-                                    message: '无数据',
-                                    type: 'warning',
-                                    duration: 3000
-                                });
-                            }
-                            manage.tableData = data.data;
-                        },
-                        error: function(XMLResponse) {
-                            manage.$message.error({
-                                message: '服务器连接失败',
-                                duration: 2000
-                            });
-                        }
-                    });
-                },
                 //侧边栏
                 handleOpen(key, keyPath) {
                     //console.log(key, keyPath);
@@ -316,52 +257,8 @@
                     this.currentPage = currentPage;
                 },
                 //删除
-                deleteRow(index, rows, _this) {
-
-                    this.$confirm('是否要删除文章?', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                    }).then(() => {
-                        $.ajax({
-                            type: "post",
-                            url: "manage/del",
-                            dataType: "json",
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            data: {
-                                id: _this.id
-                            },
-                            success: function(data) {
-                                if (data.code == 200) {
-                                    rows.splice(index, 1);
-                                    manage.$message({
-                                        message: data.msg,
-                                        type: 'success',
-                                        duration: 3000
-                                    });
-                                } else {
-                                    manage.$message({
-                                        message: data.msg,
-                                        type: 'warning',
-                                        duration: 3000
-                                    });
-                                }
-                            },
-                            error: function(XMLResponse) {
-                                manage.$message.error({
-                                    message: '服务器连接失败',
-                                    duration: 2000
-                                });
-                            }
-                        });
-                    }).catch(() => {
-                        this.$message({
-                            type: 'info',
-                            message: '已取消删除'
-                        });
-                    });
+                deleteRow(index, rows) {
+                    rows.splice(index, 1);
                 },
 
             }

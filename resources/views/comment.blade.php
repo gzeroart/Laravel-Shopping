@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>评论管理</title>
     <link rel="stylesheet" href="{{asset('asset/admin/element-ui/lib/theme-chalk/index.css')}}">
     <script src="{{asset('asset/admin/vue/vue.js')}}"></script>
@@ -28,7 +29,7 @@
         color: azure;
         position: absolute;
         top: 0;
-        z-index: 1111111;
+        z-index: 1000;
     }
 
     .header h3 {
@@ -166,30 +167,30 @@
                     <el-form-item label="开始时间" required>
                         <el-col :span="11">
                             <el-form-item prop="date1">
-                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date1">
+                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date1" value-format="yyyy-MM-dd">
                                 </el-date-picker>
                             </el-form-item>
                         </el-col>
                         <el-col :span="2" style="text-align: center;">至</el-col>
                         <el-col :span="11">
                             <el-form-item prop="date2">
-                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date2">
+                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date2" value-format="yyyy-MM-dd">
                                 </el-date-picker>
                             </el-form-item>
                         </el-col>
                     </el-form-item>
 
                     <el-form-item>
-                        <el-button type="success">查询</el-button>
+                        <el-button type="success" @click="queryInfo">查询</el-button>
                         <el-button type="success" @click="resetForm('ruleForm')">重置</el-button>
-                        <el-button type="success">全部通过</el-button>
-                        <el-button type="success">全部驳回</el-button>
-                        <el-button type="success">全部删除</el-button>
+                        <el-button type="success" @click="examineAll(1)">全部通过</el-button>
+                        <el-button type="success" @click="examineAll(0)">全部驳回</el-button>
+                        <el-button type="success" @click="delAll('','all')">全部删除</el-button>
                     </el-form-item>
                 </el-form>
             </div>
             <div class="main-table">
-                <el-table :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)" border>
+                <el-table :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)" @selection-change="handleSelectionChange" border>
                     <el-table-column type="selection" width="55"></el-table-column>
                     <el-table-column fixed prop="name" label="用户名" width="200">
                     </el-table-column>
@@ -204,11 +205,11 @@
                     <el-table-column prop="state" label="审核状态" width="200">
                     </el-table-column>
 
-                    <el-table-column prop="operation" label="操作" width="300">
+                    <el-table-column prop="cid" label="操作" width="300">
                         <template slot-scope="scope">
-                            <el-button type="primary" size="small">通过</el-button>
-                            <el-button type="primary" size="small">驳回</el-button>
-                            <el-button type="warning" @click.native.prevent="deleteRow(scope.$index, tableData)" size="small">删除</el-button>
+                            <el-button type="primary" size="small" @click="examineRow(scope.row,1)">通过</el-button>
+                            <el-button type="primary" size="small" @click="examineRow(scope.row,0)">驳回</el-button>
+                            <el-button type="warning" size="small" @click="delAll(scope.row,'one')">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -219,7 +220,7 @@
     </div>
     <script src="{{asset('asset/admin/jquery3-4-1/jquery.min.js')}}"></script>
     <script>
-        new Vue({
+        const comm = new Vue({
             el: '#app',
             data() {
                 return {
@@ -239,6 +240,7 @@
 
                     tableData: [
                         @foreach($us as $key => $dat) {
+                            cid: "{{$key}}",
                             id: "{{$dat['id']}}", //ID
                             name: "{{$dat['name']}}", //用户名
                             tradeName: "{{$dat['tradeName']}}", //商品名
@@ -256,6 +258,212 @@
 
             },
             methods: {
+                delAll(_this, _type) {
+                    //记录选中的值
+                    var tabData = comm.multipleSelection;
+                    //选中数量
+                    var tabnum = comm.multipleSelection.length;
+                    if (tabnum > 0) {
+
+
+                        //判断全选删除和单独删除
+                        if (_this == '') {
+                            _this = comm.multipleSelection;
+                        }
+                        this.$confirm('确定删除吗?', '提示', {
+                            confirmButtonText: '确定',
+                            cancelButtonText: '取消',
+                            type: 'warning'
+                        }).then(() => {
+                            $.ajax({
+                                type: "post",
+                                url: "comment/del",
+                                dataType: "json",
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                data: {
+                                    data: _this,
+                                    audit: _type
+                                },
+                                success: function(data) {
+                                    if (data.code == 200) {
+                                        comm.tableData = data.data;
+                                        comm.$message({
+                                            message: data.msg,
+                                            type: 'success',
+                                            duration: 3000
+                                        });
+                                    } else {
+                                        comm.$message({
+                                            message: data.msg,
+                                            type: 'warning',
+                                            duration: 3000
+                                        });
+                                    }
+                                },
+                                error: function(XMLResponse) {
+                                    comm.$message.error({
+                                        message: '服务器连接失败',
+                                        duration: 2000
+                                    });
+                                }
+                            });
+                        }).catch(() => {
+
+                        });
+                    } else {
+                        comm.$message.error({
+                            message: '请选择需要删除的评论',
+                            duration: 2000
+                        });
+                    }
+                },
+                //删除
+                deleteRow(index, rows) {
+                    rows.splice(index, 1);
+                },
+                examineAll(_type) {
+                    //记录选中的值
+                    var tabData = comm.multipleSelection;
+                    //选中数量
+                    var tabnum = comm.multipleSelection.length;
+                    if (tabnum > 0) {
+                        $.ajax({
+                            type: "post",
+                            url: "comment/mods",
+                            dataType: "json",
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            data: {
+                                data: comm.multipleSelection,
+                                audit: _type
+                            },
+                            success: function(data) {
+                                // console.log(data);
+                                if (data.code == 200) {
+                                    if (data.res != '') {
+                                        for (let i = 0; i < tabnum; i++) {
+                                            comm.tableData[tabData[i]['cid']].state = data.res;
+                                        }
+                                    }
+                                    comm.$message({
+                                        message: data.msg,
+                                        type: 'success',
+                                        duration: 3000
+                                    });
+                                } else {
+                                    comm.$message({
+                                        message: data.msg,
+                                        type: 'warning',
+                                        duration: 3000
+                                    });
+                                }
+                            },
+                            error: function(XMLResponse) {
+                                comm.$message.error({
+                                    message: '服务器连接失败',
+                                    duration: 2000
+                                });
+                            }
+                        });
+                    } else {
+                        comm.$message.error({
+                            message: '请选择需要审核的评论',
+                            duration: 2000
+                        });
+                    }
+                },
+                //多选择
+                handleSelectionChange(val) {
+                    this.multipleSelection = val;
+                },
+                //通过row
+                examineRow(_this, _type) {
+                    this.$confirm('确定审核吗?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        $.ajax({
+                            type: "post",
+                            url: "comment/mod",
+                            dataType: "json",
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            data: {
+                                id: _this.id,
+                                audit: _type
+                            },
+                            success: function(data) {
+                                if (data.code == 200) {
+                                    if (data.res != '') {
+                                        _this.state = data.res;
+                                    }
+                                    comm.$message({
+                                        message: data.msg,
+                                        type: 'success',
+                                        duration: 3000
+                                    });
+                                } else {
+                                    comm.$message({
+                                        message: data.msg,
+                                        type: 'warning',
+                                        duration: 3000
+                                    });
+                                }
+                            },
+                            error: function(XMLResponse) {
+                                comm.$message.error({
+                                    message: '服务器连接失败',
+                                    duration: 2000
+                                });
+                            }
+                        });
+                    }).catch(() => {
+
+                    });
+                },
+                //查询
+                queryInfo() {
+                    $.ajax({
+                        type: "post",
+                        url: "comment/qus",
+                        dataType: "json",
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data: {
+                            name: comm.ruleForm.name,
+                            date1: comm.ruleForm.date1, //时间  开始
+                            date2: comm.ruleForm.date2, //时间  结束
+                        },
+                        success: function(data) {
+                            if (data.code == 200) {
+                                comm.$message({
+                                    message: data.msg,
+                                    type: 'success',
+                                    duration: 3000
+                                });
+                            } else {
+                                comm.$message({
+                                    message: data.msg,
+                                    type: 'warning',
+                                    duration: 3000
+                                });
+                            }
+                            comm.tableData = data.data;
+                        },
+                        error: function(XMLResponse) {
+                            comm.$message.error({
+                                message: '服务器连接失败',
+                                duration: 2000
+                            });
+                        }
+                    });
+                },
                 //侧边栏
                 handleOpen(key, keyPath) {
                     //console.log(key, keyPath);
@@ -288,10 +496,7 @@
                 handleCurrentChange: function(currentPage) {
                     this.currentPage = currentPage;
                 },
-                //删除
-                deleteRow(index, rows) {
-                    rows.splice(index, 1);
-                },
+
 
             }
         })

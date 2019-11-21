@@ -6,10 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>文章管理-文章管理</title>
+    <title>订单管理——查看订单</title>
     <link rel="stylesheet" href="{{asset('asset/admin/element-ui/lib/theme-chalk/index.css')}}">
     <script src="{{asset('asset/admin/vue/vue.js')}}"></script>
     <script src="{{asset('asset/admin/element-ui/lib/index.js')}}"></script>
+
 </head>
 <style>
     * {
@@ -155,56 +156,91 @@
         <!-- 主体内容 -->
         <div class="main">
             <div class="main-form">
-                <el-form :model="ruleForm" ref="ruleForm" label-width="130px" class="demo-ruleForm">
-                    <el-form-item label-width="0">
-                        <el-form-item label="标题" prop="name">
-                            <el-col :span="11">
-                                <el-input placeholder="请输入标题" v-model="ruleForm.name"></el-input>
-                            </el-col>
+                <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="130px" class="demo-ruleForm">
 
-                            <el-form-item label="文章分类" prop="article" label-width="100px">
-                                <el-col :span="11">
-                                    <el-input placeholder="请输入文章分类" v-model="ruleForm.article"></el-input>
-                                </el-col>
-                            </el-form-item>
-                        </el-form-item>
+                    <el-form-item label="订单编号" prop="username">
+                        <el-col :span="13">
+                            <el-input placeholder="请输入订单编号" v-model="ruleForm.username"></el-input>
+                        </el-col>
                     </el-form-item>
-                    <el-form-item label="更新时间" required>
-                        <el-col :span="11">
-                            <el-form-item prop="date1">
-                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date1"></el-date-picker>
+
+                    <el-form-item label-width="0px">
+                        <el-col :span="7">
+                            <el-form-item label="付款标志" prop="enabled">
+                                <el-select v-model="ruleForm.enabled" placeholder="请选择状态">
+                                    <el-option label="全部" value="all"></el-option>
+                                    <el-option label="未付" value="0"></el-option>
+                                    <el-option label="已付" value="1"></el-option>
+                                </el-select>
                             </el-form-item>
                         </el-col>
-                        <el-col :span="2" style="text-align: center;">至</el-col>
-                        <el-col :span="11">
-                            <el-form-item prop="date2">
-                                <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date2"></el-date-picker>
+                        <el-col :span="7">
+                            <el-form-item label="订单状态" prop="role">
+                                <el-select v-model="ruleForm.role" placeholder="请选择状态">
+                                    <el-option label="全部" value="all"></el-option>
+                                    <el-option label="订单编辑中" value="0"></el-option>
+                                    <el-option label="已下单" value="1"></el-option>
+                                    <el-option label="配送中" value="2"></el-option>
+                                    <el-option label="配送完成" value="3"></el-option>
+                                    <el-option label="订单取消" value="4"></el-option>
+                                </el-select>
+                            </el-form-item>
+                        </el-col>
+                    </el-form-item>
+
+                    <el-form-item label="总价" required>
+                        <el-col :span="6">
+                            <el-form-item prop="price1">
+                                <el-input placeholder="请输入价格" v-model="ruleForm.price1"></el-input>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="1" style="text-align: center;">至</el-col>
+                        <el-col :span="6">
+                            <el-form-item prop="price2">
+                                <el-input placeholder="请输入价格" v-model="ruleForm.price2"></el-input>
+                            </el-form-item>
+                        </el-col>
+                    </el-form-item>
+
+                    <el-form-item label="下单时间">
+                        <el-col :span="6">
+                            <el-form-item prop="lastLoginTimeForm">
+                                <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd" v-model="ruleForm.lastLoginTimeForm"></el-date-picker>
+                            </el-form-item>
+                        </el-col>
+                        <el-col :span="1" style="text-align: center;">至</el-col>
+                        <el-col :span="6">
+                            <el-form-item prop="lastLoginTimeTo">
+                                <el-date-picker type="date" placeholder="选择日期" value-format="yyyy-MM-dd" v-model="ruleForm.lastLoginTimeTo"></el-date-picker>
                             </el-form-item>
                         </el-col>
                     </el-form-item>
 
                     <el-form-item>
-                        <el-button type="primary" @click="queryInfo()">查询</el-button>
-                        <el-button type="info" @click="resetForm('ruleForm')">重置</el-button>
-                        <el-button type="primary">新增</el-button>
+                        <el-button type="primary" @click="queryInfo">查询</el-button>
+                        <el-button @click="resetForm('ruleForm')">重置</el-button>
                     </el-form-item>
                 </el-form>
             </div>
             <div class="main-table">
                 <el-table :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)" border>
-                    <el-table-column fixed prop="title" label="标题" width="200">
+                    <el-table-column fixed prop="username" label="订单编号">
                     </el-table-column>
-                    <el-table-column fixed prop="date" label="分类名" width="200">
+                    <el-table-column prop="nickname" label="总价" width="150">
                     </el-table-column>
-                    <el-table-column prop="province" label="最后更新时间">
+                    <el-table-column prop="email" label="付款标志" width="120">
                     </el-table-column>
-                    <el-table-column prop="name" label="更新者名" width="200">
+                    <el-table-column prop="enabled" label="订单状态" width="130">
                     </el-table-column>
-
-                    <el-table-column prop="edit" label="操作" width="200">
+                    <el-table-column prop="role" label="联系人" width="150">
+                    </el-table-column>
+                    <el-table-column prop="lastLoginTime" label="联系电话" width="250">
+                    </el-table-column>
+                    <el-table-column prop="registerTime" label="订单时间" width="250">
+                    </el-table-column>
+                    <el-table-column prop="edit" label="操作" width="96">
                         <template slot-scope="scope">
-                            <el-button type="primary" @click="" size="small">编辑</el-button>
-                            <el-button type="warning" @click.native.prevent="deleteRow(scope.$index, tableData,scope.row)" size="small">删除</el-button>
+                            <el-button @click="userEdit(scope.row)">查看</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -217,29 +253,42 @@
 
     </div>
     <script src="{{asset('asset/admin/jquery3-4-1/jquery.min.js')}}"></script>
+
     <script>
-        const manage = new Vue({
+        const order = new Vue({
             el: '#app',
             data() {
                 return {
-                    collapse: false,
                     value: '',
                     ruleForm: {
-                        name: '', //标题
-                        article: '', //文章分类
-                        date1: '', //更新时间  开始
-                        date2: '', //更新时间  结束
+                        username: '', //订单编号
+                        role: 'all', //订单状态
+                        lastLoginTimeForm: '', //开始时间
+                        lastLoginTimeTo: '', //结束时间
+                        enabled: 'all', //付款标志
                         delivery: false,
                         type: [],
+                        price1: '', //总价开始
+                        price2: '', //总价结束
                     },
-
+                    rules: {
+                        region: [{
+                            required: true,
+                            message: '请选择',
+                            trigger: 'change'
+                        }],
+                    },
+                    pageOn: '{{$pageOn}}',
                     tableData: [
                         @foreach($us as $key => $dat) {
-                            id: "{{$dat['id']}}",
-                            title: '{{$dat["title"]}}', //标题
-                            date: '{{$dat["date"]}}', //分类名
-                            name: '{{$dat["name"]}}', //更新者名
-                            province: '{{$dat["province"]}}', //最后更新时间
+                            username: "{{$dat['order_num']}}", //订单编号
+                            nickname: "{{$dat['price']}}", //总价
+                            email: "{{$dat['payment_flag']}}", //付款标志
+                            enabled: "{{$dat['status']}}", //订单状态
+                            role: "{{$dat['contact_name']}}", //联系人
+                            lastLoginTime: "{{$dat['contact_mobile']}}", //联系电话
+                            registerTime: "{{$dat['create_time']}}", //订单时间
+                            edit: "{{$key}}", //查看
                         },
                         @endforeach
                     ],
@@ -249,51 +298,46 @@
 
             },
             methods: {
+
+                userEdit(_this) {
+                    window.location = './user/' + _this.edit;
+                },
                 queryInfo() {
                     $.ajax({
                         type: "post",
-                        url: "manage/qus",
+                        url: "order/qus",
                         dataType: "json",
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
-                        data: manage.ruleForm,
+                        data: order.ruleForm,
                         success: function(data) {
-                            var datalen = data.data.length;
-                            if (datalen != 0) {
-                                manage.$message({
-                                    message: '查询到相关数据' + datalen + '条',
+                            //console.log(data);
+                            if (data.code == 200) {
+                                order.$message({
+                                    message: data.msg,
                                     type: 'success',
                                     duration: 3000
                                 });
                             } else {
-                                manage.$message({
-                                    message: '无数据',
+                                order.$message({
+                                    message: data.msg,
                                     type: 'warning',
                                     duration: 3000
                                 });
                             }
-                            manage.tableData = data.data;
+                            order.tableData = data.data;
                         },
                         error: function(XMLResponse) {
-                            manage.$message.error({
+                            order.$message.error({
                                 message: '服务器连接失败',
                                 duration: 2000
                             });
                         }
                     });
                 },
-                //侧边栏
-                handleOpen(key, keyPath) {
-                    //console.log(key, keyPath);
-                },
-                handleClose(key, keyPath) {
-                    // console.log(key, keyPath);
-                },
-                // 侧边栏折叠
-                collapseChage() {
-                    //this.collapse = !this.collapse;
-                },
+
+
                 submitForm(formName) {
                     this.$refs[formName].validate((valid) => {
                         if (valid) {
@@ -304,64 +348,15 @@
                         }
                     });
                 },
-                //重置按钮
+                //重置
                 resetForm(formName) {
                     this.$refs[formName].resetFields();
                 },
-                //分页
                 handleSizeChange: function(val) {
                     this.pagesize = val;
                 },
                 handleCurrentChange: function(currentPage) {
                     this.currentPage = currentPage;
-                },
-                //删除
-                deleteRow(index, rows, _this) {
-
-                    this.$confirm('是否要删除文章?', '提示', {
-                        confirmButtonText: '确定',
-                        cancelButtonText: '取消',
-                        type: 'warning'
-                    }).then(() => {
-                        $.ajax({
-                            type: "post",
-                            url: "manage/del",
-                            dataType: "json",
-                            headers: {
-                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                            },
-                            data: {
-                                id: _this.id
-                            },
-                            success: function(data) {
-                                if (data.code == 200) {
-                                    rows.splice(index, 1);
-                                    manage.$message({
-                                        message: data.msg,
-                                        type: 'success',
-                                        duration: 3000
-                                    });
-                                } else {
-                                    manage.$message({
-                                        message: data.msg,
-                                        type: 'warning',
-                                        duration: 3000
-                                    });
-                                }
-                            },
-                            error: function(XMLResponse) {
-                                manage.$message.error({
-                                    message: '服务器连接失败',
-                                    duration: 2000
-                                });
-                            }
-                        });
-                    }).catch(() => {
-                        this.$message({
-                            type: 'info',
-                            message: '已取消删除'
-                        });
-                    });
                 },
 
             }
