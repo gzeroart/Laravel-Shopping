@@ -12,11 +12,13 @@
     </div>
     <!-- 菜单 -->
     <div class="menu menu-active">
-        <el-menu default-active="{{$pageOn}}" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose" background-color="#545c64" text-color="#fff" active-text-color="#ffd04b" :collapse="collapse" unique-opened>
+        <el-menu default-active="{{$pageOn}}" class="el-menu-vertical-demo" @open="handleOpen" @close="handleClose"
+            background-color="#545c64" text-color="#fff" active-text-color="#ffd04b" :collapse="collapse" unique-opened>
             <el-submenu style="padding-top: 80px;" index="1">
                 <template slot="title"> <i class="el-icon-goods"></i><span>商品管理</span></template>
                 <el-menu-item-group>
-                    <el-menu-item index="1-1">商品分类管理</el-menu-item>
+                    <el-menu-item index="productCategoryList" @click="navJump('productCategoryList')">商品分类管理
+                    </el-menu-item>
                     <el-menu-item index="productList" @click="navJump('productList')">商品管理</el-menu-item>
                     <el-menu-item index="option" @click="navJump('option')">Option管理</el-menu-item>
                 </el-menu-item-group>

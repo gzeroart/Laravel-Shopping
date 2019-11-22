@@ -95,6 +95,12 @@ Route::get('/admin/productList', function () {
     return view("productList", ['us' => $us, 'pageOn' => 'productList']);
 });
 
+//商品管理->商品管理->商品分类管理
+Route::get('/admin/productCategoryList', function () {
+    $us = array();
+    return view("productCategoryList", ['us' => $us, 'pageOn' => 'productCategoryList']);
+});
+
 
 ##############################商品管理#####################################
 
