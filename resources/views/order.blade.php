@@ -240,7 +240,7 @@
                     </el-table-column>
                     <el-table-column prop="edit" label="操作" width="96">
                         <template slot-scope="scope">
-                            <el-button @click="userEdit(scope.row)">查看</el-button>
+                            <el-button @click="orderEdit(scope.row)">查看</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -299,8 +299,8 @@
             },
             methods: {
 
-                userEdit(_this) {
-                    window.location = './user/' + _this.edit;
+                orderEdit(_this) {
+                    window.location = './order/' + _this.username;
                 },
                 queryInfo() {
                     $.ajax({

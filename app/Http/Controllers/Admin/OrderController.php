@@ -162,23 +162,67 @@ class OrderController extends Controller
     }
 
     //查看指定订单消息
-    public function orderrow()
+    public function orderrow(Request $request)
     {
-        $users = DB::table('user')->get();
-        dump($users);
-        //定义一个空数组
-        $us = array();
-        foreach ($users as $k => $user) {
+        //order_info order_item product
+        //
+        //select t1.id, t1.order_num, t1.product_id, t1.price, t1.quantity, t1.user_id,t1.option_value_key_group, t1.json_data, t1.sku_id , t3.id as ProductId, t3.name as ProductName, t3.Category_id as ProductCategory_id, t3.General_explain as ProductGeneral_explain, t3.Discount as ProductDiscount, t3.Shop_price as ProductShop_price, t3.Price as ProductPrice, t3.Quantity as ProductQuantity, t3.Hot as ProductHot, t3.Product_status as ProductProduct_status, t3.default_img from order_item t1 left join product t3 on t1.product_id = t3.id LEFT JOIN order_info t4 ON t1.order_num = t4.order_num WHERE ( t1.user_id = 123522 and t1.order_num = 'O2016111900012' and t4.type = 0 )
+        // $_sql = "select t1.id, t1.order_num, t1.product_id, t1.price, t1.quantity, t1.user_id,t1.option_value_key_group, t1.json_data, t1.sku_id , t3.id as ProductId, t3.name as ProductName, t3.Category_id as ProductCategory_id, t3.General_explain as ProductGeneral_explain, t3.Discount as ProductDiscount, t3.Shop_price as ProductShop_price, t3.Price as ProductPrice, t3.Quantity as ProductQuantity, t3.Hot as ProductHot, t3.Product_status as ProductProduct_status, t3.default_img from order_item t1 left join product t3 on t1.product_id = t3.id LEFT JOIN order_info t4 ON t1.order_num = t4.order_num WHERE ( t1.user_id = 123522 and t1.order_num = 'O2016110800005' and t4.type = 0 )";
+        /*
+ select order_num, price, payment_flag, user_id, contact_name, contact_mobile, contact_address, message, status, type, create_time from order_info where order_num = 'O2016110800005' 
+
+select t1.id, t1.order_num, t1.product_id, t1.price, t1.quantity, t1.user_id,t1.option_value_key_group, t1.json_data, t1.sku_id , t3.id as ProductId, t3.name as ProductName, t3.Category_id as ProductCategory_id, t3.General_explain as ProductGeneral_explain, t3.Discount as ProductDiscount, t3.Shop_price as ProductShop_price, t3.Price as ProductPrice, t3.Quantity as ProductQuantity, t3.Hot as ProductHot, t3.Product_status as ProductProduct_status, t3.default_img from order_item t1 left join product t3 on t1.product_id = t3.id LEFT JOIN order_info t4 ON t1.order_num = t4.order_num WHERE ( t1.user_id = 123486 and t1.order_num = 'O2016110800005' and t4.type = 0 ) 
+
+select
+
+select id, company_name, logistics_num, order_num, state, contact_name, contact_mobile, contact_address, create_time,date_format(create_time,'%Y-%m-%d %H:%m:%d') AS timestamp from logistics WHERE ( order_num = 'O2016110800005' ) 
+
+select id, order_num, status, note, update_user_id, create_time from order_history WHERE ( order_num = 'O2016110800005' ) order by create_time desc 
+*/
+        $userid = $request->id;
+        //基本信息
+        $users = DB::table('order_info')->where('order_num', $userid)->first();
+        $us = array(
+            "username" => $users->order_num, //订单号
+            "enabled" => $this->status($users->status), //订单状态
+            "role" => $users->contact_name, //联系人
+            'address' => $users->contact_address, //地址
+            "lastLoginTime" => $users->contact_mobile, //联系电话
+            "registerTime" => $users->create_time, //订单时间
+        );
+        $data['info'] = $us; //储存基本信息数据
+
+        //订单历史
+        $his = DB::table('order_history')->where('order_num', $userid)->get();
+        $dat_his = array();
+        foreach ($his as $k => $_his) {
             //合并数组
-            array_push($us, array(
-                "username" => $user->order_num, //订单号
-                "nickname" => ($user->price / 100), //总价
-                "email" => $this->payflag($user->payment_flag), //付款标志
-                "enabled" => $this->status($user->status), //订单状态
-                "role" => $user->contact_name, //联系人
-                "lastLoginTime" => $user->contact_mobile, //联系电话
-                "registerTime" => $user->create_time, //订单时间
+            array_push($dat_his, array(
+                "name" => $_his->note, //状态
+                "date" => $_his->create_time, //时间
             ));
         }
+        $data['his'] = $dat_his; //储存订单历史数据
+
+        //获取参数
+        $user_id = DB::table('order_item')->where('order_num', $userid)->get('product_id');
+        foreach ($user_id as $key => $value) {
+            $idAll[$key] = $value->product_id;
+        }
+        // 订单明细
+        $dets = DB::table('product')->whereIn('id',  $idAll)->get();
+        // dump($det);
+        //定义一个数组
+        $de = array();
+        foreach ($dets as $k => $det) {
+            //合并数组
+            array_push($de, array(
+                "name" => $det->name, //商品名称
+                "num" => $det->category_id, //数量
+                "amount" => ($det->shop_price / 100), //单价
+            ));
+        }
+        $data['det'] = $de; //储存订单明细数据
+        return view('orderedit', ['pageOn' => 'order', 'dat' => $data]);
     }
 }

@@ -76,17 +76,30 @@ Route::post('/admin/order/qus', 'Admin\OrderController@orderinfo');
 
 //订单管理->订单管理
 Route::get('/admin/order', 'Admin\OrderController@orderList');
-Route::get('/admin/111', 'Admin\OrderController@orderrow');
+//订单管理->订单查看
+Route::get('/admin/order/{id}', 'Admin\OrderController@orderrow');
 
 ##############################商品管理#####################################
+//商品管理->option->删除
+Route::post('/admin/option/del', 'Admin\GoodsController@optiondel');
+//商品管理->option->添加
+Route::post('/admin/option/add', 'Admin\GoodsController@optionadd');
+//商品管理->option->查询
+Route::post('/admin/option/qus', 'Admin\GoodsController@optionqus');
 
+
+//商品管理->option->编辑
+Route::get('/admin/opedit/{id}', 'Admin\GoodsController@optionedit');
 //商品管理->option
-Route::get('/admin/option', function () {
-    $us = array();
-    return view("optioninfo", ['us' => $us, 'pageOn' => 'option']);
-});
+Route::get('/admin/option', 'Admin\GoodsController@option');
+//商品管理->option添加
+Route::get('/admin/addoption', 'Admin\GoodsController@addoption');
 
 
+//商品分类管理->添加
+Route::post('/admin/product/add', 'Admin\GoodsController@productadd');
+//商品分类管理->删除
+Route::post('/admin/product/del', 'Admin\GoodsController@productdel');
 
 //productList
 //商品管理->商品管理
@@ -96,10 +109,7 @@ Route::get('/admin/productList', function () {
 });
 
 //商品管理->商品管理->商品分类管理
-Route::get('/admin/productCategoryList', function () {
-    $us = array();
-    return view("productCategoryList", ['us' => $us, 'pageOn' => 'productCategoryList']);
-});
+Route::get('/admin/productCategoryList', 'Admin\GoodsController@goodssort');
 
 
 ##############################商品管理#####################################
@@ -117,6 +127,13 @@ Route::get('/admin', function () {
 Route::get('/', function () {
     echo "这是首页";
 });
+
+//商品分类管理->图片上传
+Route::any('/admin/111', 'Admin\GoodsController@upload');
+
+// Route::get('/admin/111', function () {
+//     return view('111');
+// });
 
 ##############################电子钱包#####################################
 

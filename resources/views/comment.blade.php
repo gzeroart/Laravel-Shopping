@@ -263,11 +263,9 @@
                     var tabData = comm.multipleSelection;
                     //选中数量
                     var tabnum = comm.multipleSelection.length;
-                    if (tabnum > 0) {
-
-
+                    if (tabnum > 0 || _type == 'one') {
                         //判断全选删除和单独删除
-                        if (_this == '') {
+                        if (_type == 'all') {
                             _this = comm.multipleSelection;
                         }
                         this.$confirm('确定删除吗?', '提示', {

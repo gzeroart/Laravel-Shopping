@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>商品管理-option管理</title>
     <link rel="stylesheet" href="{{asset('asset/admin/element-ui/lib/theme-chalk/index.css')}}">
     <script src="{{asset('asset/admin/vue/vue.js')}}"></script>
@@ -28,7 +29,7 @@
         color: azure;
         position: absolute;
         top: 0;
-        z-index: 1111111;
+        z-index: 1000;
     }
 
     .header h3 {
@@ -168,23 +169,23 @@
                     </el-form-item>
 
                     <el-form-item>
-                        <el-button type="primary">查询</el-button>
+                        <el-button type="primary" @click="qusinfo">查询</el-button>
                         <el-button type="info" @click="resetForm('ruleForm')">重置</el-button>
-                        <el-button type="primary">添加</el-button>
+                        <el-button type="primary" @click="addoption">添加</el-button>
                         <el-button type="primary">删除</el-button>
                     </el-form-item>
                 </el-form>
             </div>
             <div class="main-table">
                 <el-table :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)" border>
-                    <el-table-column fixed prop="title" label="标题">
+                    <el-table-column fixed prop="title" label="option编号">
                     </el-table-column>
-                    <el-table-column fixed prop="date" label="分类名">
+                    <el-table-column fixed prop="date" label="option名称">
                     </el-table-column>
                     <el-table-column prop="edit" label="操作" width="300">
                         <template slot-scope="scope">
-                            <el-button type="primary" @click="open2" size="small">编辑</el-button>
-                            <el-button type="warning" @click.native.prevent="deleteRow(scope.$index, tableData)" size="small">删除</el-button>
+                            <el-button type="primary" @click="opEdit(scope.row)" size="small">编辑</el-button>
+                            <el-button type="warning" @click.native.prevent="deleteRow(scope.$index, tableData,scope.row)" size="small">删除</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -198,7 +199,7 @@
     </div>
     <script src="{{asset('asset/admin/jquery3-4-1/jquery.min.js')}}"></script>
     <script>
-        new Vue({
+        const option = new Vue({
             el: '#app',
             data() {
                 return {
@@ -224,6 +225,50 @@
 
             },
             methods: {
+                opEdit(_this) {
+                    window.location = './opedit/' + _this.id;
+                },
+                qusinfo() {
+                    console.log(option.ruleForm);
+                    $.ajax({
+                        type: "post",
+                        url: "option/qus",
+                        dataType: "json",
+                        headers: {
+                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                        },
+                        data: {
+                            id: option.ruleForm.name,
+                            name: option.ruleForm.article
+                        },
+                        success: function(data) {
+                            console.log(data);
+                            if (data.code == 200) {
+                                option.tableData = data.data;
+                                option.$message({
+                                    message: data.msg,
+                                    type: 'success',
+                                    duration: 2500
+                                });
+                            } else {
+                                option.$message({
+                                    message: data.msg,
+                                    type: 'warning',
+                                    duration: 3000
+                                });
+                            }
+                        },
+                        error: function(XMLResponse) {
+                            option.$message.error({
+                                message: '服务器连接失败',
+                                duration: 2000
+                            });
+                        }
+                    });
+                },
+                addoption() {
+                    window.location = './addoption';
+                },
                 //侧边栏
                 handleOpen(key, keyPath) {
                     //console.log(key, keyPath);
@@ -257,8 +302,49 @@
                     this.currentPage = currentPage;
                 },
                 //删除
-                deleteRow(index, rows) {
-                    rows.splice(index, 1);
+                deleteRow(index, rows, _this) {
+                    this.$confirm('确定删除吗?', '提示', {
+                        confirmButtonText: '确定',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        $.ajax({
+                            type: "post",
+                            url: "option/del",
+                            dataType: "json",
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            data: {
+                                id: _this.id
+                            },
+                            success: function(data) {
+                                console.log(data);
+                                if (data.code == 200) {
+                                    rows.splice(index, 1);
+                                    option.$message({
+                                        message: data.msg,
+                                        type: 'success',
+                                        duration: 2500
+                                    });
+                                } else {
+                                    option.$message({
+                                        message: data.msg,
+                                        type: 'warning',
+                                        duration: 3000
+                                    });
+                                }
+                            },
+                            error: function(XMLResponse) {
+                                option.$message.error({
+                                    message: '服务器连接失败',
+                                    duration: 2000
+                                });
+                            }
+                        });
+                    }).catch(() => {
+
+                    });
                 },
 
             }
