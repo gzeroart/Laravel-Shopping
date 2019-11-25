@@ -160,6 +160,7 @@
                         <el-button type="primary" @click="submitForm('dynamicValidateForm')">提交</el-button>
                         <el-button onclick="window.history.go(-1)">返回</el-button>
                     </el-form-item>
+
                 </el-form>
             </div>
         </div>
@@ -172,36 +173,48 @@
                 return {
                     collapse: false,
                     dynamicValidateForm: {
-                        domains: [{
-                            value: ''
-                        }],
-                        name: ''
+                        domains: [
+                            @foreach($opt['val'] as $key => $dat) {
+                                value: '{{$dat["name"]}}',
+                                id: '{{$dat["id"]}}'
+                            },
+                            @endforeach
+                        ],
+                        id: '{{$opt["id"]}}',
+                        name: '{{$opt["name"]}}'
                     }
                 }
             },
             methods: {
                 submitForm(_this) {
                     console.log(this.dynamicValidateForm);
-                    console.log(this.dynamicValidateForm.domains[0].value);
+                    // console.log(this.dynamicValidateForm.domains[0].value);
+                    var v_value = '';
+                    if (this.dynamicValidateForm.domains.length > 0) {
+                        v_value = this.dynamicValidateForm.domains;
+                        console.log(v_value);
+                    }
                     $.ajax({
                         type: "post",
-                        url: "option/add",
+                        url: "../option/mod",
                         dataType: "json",
                         headers: {
                             'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                         },
                         data: {
+                            id: addop.dynamicValidateForm.id,
                             name: addop.dynamicValidateForm.name,
-                            val: addop.dynamicValidateForm.domains
+                            data: v_value
                         },
                         success: function(data) {
                             if (data.code == 200) {
                                 addop.$message({
                                     message: data.msg,
                                     type: 'success',
-                                    duration: 1500,
+                                    duration: 1200,
                                     onClose: function() {
-                                        window.location = './option';
+                                        //页面刷新
+                                        window.location.reload();
                                     }
                                 });
                             } else {
@@ -235,8 +248,15 @@
                 //删除
                 removeDomain(item) {
                     var index = this.dynamicValidateForm.domains.indexOf(item)
-                    if (index !== -0) {
+                    //如果等于空则删除
+                    if (addop.dynamicValidateForm.domains[index].id == null) {
                         this.dynamicValidateForm.domains.splice(index, 1)
+                    } else {
+                        addop.$message({
+                            message: '原有opionValue不能删除',
+                            type: 'warning',
+                            duration: 3000
+                        });
                     }
                 },
                 //新增内容

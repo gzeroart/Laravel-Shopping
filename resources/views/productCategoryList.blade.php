@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>商品分类管理</title>
     <link rel="stylesheet" href="{{asset('asset/admin/element-ui/lib/theme-chalk/index.css')}}">
 </head>
@@ -147,6 +148,10 @@
     .miao-shu {
         margin-top: 8px;
     }
+
+    .back-button {
+        margin-top: 10px;
+    }
 }
 
 .control label {
@@ -267,7 +272,8 @@
             </el-col>
 
             <el-row class="add-page" v-if="adding">
-                <el-form :model="addForm" status-icon :rules="rules" ref="addForm" label-width="100px">
+                <el-form :model="addForm" status-icon :rules="rules" ref="addForm" label-width="100px"
+                    enctype="multipart/form-data">
                     <el-form-item label="商品类名" prop="category">
                         <el-input placeholder="商品类名" v-model="addForm.category" autocomplete="off"></el-input>
                     </el-form-item>
@@ -275,14 +281,14 @@
                         <el-input placeholder="商品描述" v-model="addForm.description" autocomplete="off"></el-input>
                     </el-form-item>
                     <el-form-item label="图片" prop="img">
-                        <el-upload class="avatar-uploader" action="" :show-file-list="false"
+                        <el-upload name="source" class="avatar-uploader" action="product/icon" :show-file-list="false"
                             :on-success="handleAvatarSuccess" :before-upload="beforeAvatarUpload">
                             <img v-if="imageUrl" :src="imageUrl" class="avatar">
                             <i v-else class="el-icon-plus avatar-uploader-icon"></i>
                         </el-upload>
                     </el-form-item>
-                    <el-form-item label="id">
-                        <el-input v-model="addForm.id" :disabled="true"></el-input>
+                    <el-form-item label="排序" prop="order">
+                        <el-input v-model.number="addForm.order"></el-input>
                     </el-form-item>
                     <el-form-item label="最后更新">
                         <el-input v-model="addForm.date" :disabled="true"></el-input>
@@ -293,7 +299,7 @@
                     <el-form-item class="add-page-button">
                         <el-button @click="resetForm('addForm')">重置</el-button>
                         <el-button type="success" @click="submitForm('addForm')">保存</el-button>
-                        <el-button type="success" @click="ClosAddPage">返回</el-button>
+                        <el-button class="back-button" type="success" @click="Back">返回</el-button>
                     </el-form-item>
                 </el-form>
             </el-row>
@@ -307,9 +313,21 @@
     <script src="{{asset('asset/admin/element-ui/lib/index.js')}}"></script>
     <script src="{{asset('asset/admin/jquery3-4-1/jquery.min.js')}}"></script>
     <script>
-    new Vue({
+    const fenlei = new Vue({
         el: '#app',
         data() {
+            var Order = (rule, value, callback) => {
+                if (!value) {
+                    return callback(new Error('排序不能为空'));
+                }
+                setTimeout(() => {
+                    if (!Number.isInteger(value)) {
+                        callback(new Error('请输入数字值'));
+                    } else {
+                        callback();
+                    }
+                }, 500);
+            };
             var Category = (rule, value, callback) => { //验证添加的类名
                 if (value === '') {
                     callback(new Error('商品类名不能为空！'));
@@ -334,16 +352,18 @@
                 dataMap: '',
                 checksId: [],
                 data: [],
+
                 pagesize: 10,
                 currpage: 1,
                 search: '',
-                adding: true, //正在添加或编辑产品分类
+                adding: false, //正在添加或编辑产品分类
+                isEdit: false, //编辑
                 addForm: {
                     category: '', //正在添加的分类名
                     description: '', //正在添加的描述
-                    date: '', //最后更新时间
                     user: '', //更新者
-                    id: '',
+                    order: '', //排序
+                    imgUrl: '' //图片地址
                 },
                 imageUrl: '',
                 rules: {
@@ -354,8 +374,12 @@
                     description: [{
                         validator: Description,
                         trigger: 'blur'
+                    }],
+                    order: [{
+                        validator: Order,
+                        trigger: 'blur'
                     }]
-                }
+                },
             };
         },
         created() {
@@ -383,14 +407,15 @@
         },
         methods: {
             queryInfo() {
-
                 var resData = [
                     @foreach($us as $key => $dat) {
                         "id": "{{$dat['id']}}",
                         "category": "{{$dat['category']}}",
                         "description": "{{$dat['description']}}",
                         "date": "{{$dat['date']}}",
-                        "user": "{{$dat['user']}}"
+                        "user": "{{$dat['user']}}",
+                        "image": "{{$dat['image']}}",
+                        "sort": "{{$dat['sort']}}"
                     },
                     @endforeach
                 ];
@@ -405,41 +430,6 @@
                 this.dataMap = map;
 
                 this.ForEachMap();
-
-
-                // $.ajax({
-                //     // type: "post",
-                //     url: "data/fenlei.json",
-                //     dataType: "json",
-                //     headers: {
-                //         // 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                //     },
-                //     // data: fenlei.ruleForm,
-                //     success: function(data) {
-                //         console.log(data);
-                //         if (data.code == 200) {
-                //             fenlei.$message({
-                //                 message: data.msg,
-                //                 type: 'success',
-                //                 duration: 1500,
-                //             });
-                //         } else {
-                //             fenlei.$message({
-                //                 message: data.msg,
-                //                 type: 'warning',
-                //                 duration: 1500
-                //             });
-                //         }
-                //     },
-                //     error: function(XMLResponse) {
-                //         fenlei.$message.error({
-                //             message: '服务器连接失败',
-                //             duration: 2000
-                //         });
-                //     }
-                // });
-
-
             },
             handleOpen(key, keyPath) {
                 console.log(key, keyPath);
@@ -520,7 +510,7 @@
                 for (var i = 0; i < val.length; i++) {
                     this.checksId.push(val[i].id);
                 }
-                // console.log(this.checksId);
+                console.log(this.checksId);
             },
             //编辑表格行
             handleEdit(index, row) {
@@ -532,6 +522,53 @@
                 this.addForm.id = row.id;
                 this.addForm.date = row.date;
                 this.addForm.user = row.user;
+                var sort = parseInt(row.sort);
+                this.addForm.order = sort;
+                this.addForm.imgUrl = row.image;
+                this.imageUrl = row.image;
+
+                this.isEdit = true;
+            },
+            //删除请求
+            DeleteData(delId) {
+                console.log(delId);
+                $.ajax({
+                    type: "post",
+                    url: "product/del",
+                    dataType: "json",
+                    headers: {
+                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                    },
+                    data: {
+                        id: delId,
+                    },
+                    success: function(data) {
+                        // console.log(data);
+                        if (data.code == 200) {
+                            fenlei.$message({
+                                message: data.msg,
+                                type: 'success',
+                                duration: 1000,
+                                onClose: function() {
+                                    //页面刷新
+                                    window.location.reload();
+                                }
+                            });
+                        } else {
+                            fenlei.$message({
+                                message: data.msg,
+                                type: 'warning',
+                                duration: 1000
+                            });
+                        }
+                    },
+                    error: function(XMLResponse) {
+                        fenlei.$message.error({
+                            message: '服务器连接失败',
+                            duration: 2000
+                        });
+                    }
+                });
             },
             //删除表格行
             handleDelete(index, row, event) {
@@ -553,17 +590,21 @@
                     type: 'warning'
                 }).then(() => {
                     if (this.checksId.length == 0 || clickInArr == false) { //未多选 或点击的不在已勾选的行里，则只删除一条
-                        this.dataMap.delete(row.id);
-                        this.ForEachMap();
-                    } else { //多选删除
-                        for (var i = 0; i < this.checksId.length; i++) {
-                            this.dataMap.delete(this.checksId[i]);
-                        }
-                        this.ForEachMap();
-                    };
+                        var delId = [row.id];
+                        // console.log(delId);
 
-                    var info = '删除成功！';
-                    this.Smessage(info);
+                        this.DeleteData(delId);
+
+                        // this.dataMap.delete(row.id);
+                        // this.ForEachMap();
+                    } else { //多选删除
+                        this.DeleteData(this.checksId);
+
+                        // for (var i = 0; i < this.checksId.length; i++) {
+                        //     this.dataMap.delete(this.checksId[i]);
+                        // }
+                        // this.ForEachMap();
+                    };
                 }).catch(() => {
                     var info = '已取消删除。'
                     this.Tmessage(info);
@@ -585,36 +626,140 @@
             ClosAddPage() {
                 this.adding = false;
             },
+            //返回
+            Back() {
+                if (this.addForm.category != "" || this.addForm.description != "" || this.addForm.order != "" ||
+                    this.addForm.imgUrl != "") {
+                    this.$confirm('数据未保存, 是否返回?', '提示', {
+                        confirmButtonText: '返回',
+                        cancelButtonText: '取消',
+                        type: 'warning'
+                    }).then(() => {
+                        this.addForm = {};
+                        this.imageUrl = "";
+                        this.ClosAddPage();
+                    }).catch(() => {});
+                } else {
+                    this.ClosAddPage();
+                }
+            },
             //保存
             submitForm(formName) {
+                console.log(this.addForm.order);
                 this.$refs[formName].validate((valid) => {
                     if (valid) {
-                        var newData = {
-                            id: this.addForm.id,
-                            category: this.addForm.category,
-                            description: this.addForm.description,
-                            date: "2019-11-23",
-                            user: this.addForm.user,
+                        if (this.isEdit == false) { //新添加
+                            $.ajax({
+                                type: "post",
+                                url: "product/add",
+                                dataType: "json",
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                data: {
+                                    name: fenlei.addForm.category, //类名
+                                    desc: fenlei.addForm.description, //描述
+                                    sort: fenlei.addForm.order, //排序
+                                    icon: fenlei.addForm.imgUrl, //图片
+                                },
+                                success: function(data) {
+                                    // console.log(data);
+                                    if (data.code == 200) {
+                                        fenlei.$message({
+                                            message: data.msg,
+                                            type: 'success',
+                                            duration: 1000,
+                                            onClose: function() {
+                                                //页面刷新
+                                                window.location.reload();
+                                            }
+                                        });
+                                    } else {
+                                        fenlei.$message({
+                                            message: data.msg,
+                                            type: 'warning',
+                                            duration: 1000
+                                        });
+                                    }
+                                },
+                                error: function(XMLResponse) {
+                                    fenlei.$message.error({
+                                        message: '服务器连接失败',
+                                        duration: 2000
+                                    });
+                                }
+                            });
+                        } else { //编辑保存
+                            $.ajax({
+                                type: "post",
+                                url: "product/mod",
+                                dataType: "json",
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                },
+                                data: {
+                                    id: fenlei.addForm.id, //id
+                                    name: fenlei.addForm.category, //类名
+                                    desc: fenlei.addForm.description, //描述
+                                    sort: fenlei.addForm.order, //排序
+                                    icon: fenlei.addForm.imgUrl, //图片
+                                },
+                                success: function(data) {
+                                    console.log(data);
+                                    if (data.code == 200) {
+                                        fenlei.$message({
+                                            message: data.msg,
+                                            type: 'success',
+                                            duration: 1000,
+                                            onClose: function() {
+                                                //页面刷新
+                                                window.location.reload();
+                                            }
+                                        });
+                                    } else {
+                                        fenlei.$message({
+                                            message: data.msg,
+                                            type: 'warning',
+                                            duration: 1000
+                                        });
+                                    }
+                                },
+                                error: function(XMLResponse) {
+                                    console.log(XMLResponse);
+                                    fenlei.$message.error({
+                                        message: '服务器连接失败',
+                                        duration: 2000
+                                    });
+                                }
+                            });
                         }
-                        fenlei.map.set(this.addForm.id, newData);
-                        this.ForEachMap();
-
-                        console.log('submit!');
-                        this.addForm = {};
-                        this.ClosAddPage();
                     } else {
-                        console.log('error submit!!');
+                        fenlei.$message.error({
+                            message: '填写有误',
+                            duration: 2000
+                        });
                         return false;
                     }
                 });
             },
             resetForm(formName) {
                 // this.$refs[formName].resetFields();
-                console.log(this.imageUrl);
+                this.addForm = {
+                    category: "",
+                    date: "",
+                    description: "",
+                    id: "",
+                    img: "",
+                    imgUrl: "",
+                    order: "",
+                };
+                this.imageUrl = "";
             },
             handleAvatarSuccess(res, file) {
-                // this.imageUrl = URL.createObjectURL(file.raw);
-                console.log(this.imageUrl);
+                this.imageUrl = URL.createObjectURL(file.raw);
+                this.addForm.imgUrl = res;
+
+                // console.log(res);
             },
             beforeAvatarUpload(file) {
                 const isJPG = file.type === 'image/jpeg';

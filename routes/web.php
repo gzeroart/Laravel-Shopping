@@ -86,7 +86,8 @@ Route::post('/admin/option/del', 'Admin\GoodsController@optiondel');
 Route::post('/admin/option/add', 'Admin\GoodsController@optionadd');
 //商品管理->option->查询
 Route::post('/admin/option/qus', 'Admin\GoodsController@optionqus');
-
+//商品管理->option->修改
+Route::post('/admin/option/mod', 'Admin\GoodsController@optionmod');
 
 //商品管理->option->编辑
 Route::get('/admin/opedit/{id}', 'Admin\GoodsController@optionedit');
@@ -100,13 +101,14 @@ Route::get('/admin/addoption', 'Admin\GoodsController@addoption');
 Route::post('/admin/product/add', 'Admin\GoodsController@productadd');
 //商品分类管理->删除
 Route::post('/admin/product/del', 'Admin\GoodsController@productdel');
+//商品分类管理->修改
+Route::post('/admin/product/mod', 'Admin\GoodsController@productmod');
+//商品分类管理->图片上传
+Route::any('/admin/product/icon', 'Admin\GoodsController@upload');
 
 //productList
 //商品管理->商品管理
-Route::get('/admin/productList', function () {
-    $us = array();
-    return view("productList", ['us' => $us, 'pageOn' => 'productList']);
-});
+Route::get('/admin/productList',  'Admin\GoodsController@productList');
 
 //商品管理->商品管理->商品分类管理
 Route::get('/admin/productCategoryList', 'Admin\GoodsController@goodssort');
@@ -129,7 +131,7 @@ Route::get('/', function () {
 });
 
 //商品分类管理->图片上传
-Route::any('/admin/111', 'Admin\GoodsController@upload');
+Route::any('/admin/111', 'Admin\GoodsController@upload2');
 
 // Route::get('/admin/111', function () {
 //     return view('111');

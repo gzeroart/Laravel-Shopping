@@ -229,23 +229,25 @@
             </div>
             <div class="main-table">
                 <el-table :data="tableData.slice((currentPage-1)*pagesize,currentPage*pagesize)" border>
-                    <el-table-column fixed prop="username" label="商品名" width="150">
+                    <el-table-column fixed prop="name" label="商品名" width="250">
                     </el-table-column>
-                    <el-table-column prop="nickname" label="商品分类" width="150">
+                    <el-table-column prop="categoryid" label="商品分类" width="150">
                     </el-table-column>
-                    <el-table-column prop="email" label="商品概要说明">
+                    <el-table-column prop="explain" label="商品概要说明">
                     </el-table-column>
-                    <el-table-column prop="enabled" label="店内价格" width="130">
+                    <el-table-column prop="shopprice" label="店内价格" width="100">
                     </el-table-column>
-                    <el-table-column prop="role" label="市场价格" width="150">
+                    <el-table-column prop="price" label="市场价格" width="150">
                     </el-table-column>
-                    <el-table-column prop="lastLoginTime" label="数量" width="100">
+                    <el-table-column prop="quantity" label="数量" width="100">
                     </el-table-column>
-                    <el-table-column prop="popular" label="热门商品" width="150">
+                    <el-table-column prop="hot" label="热门商品" width="100">
                     </el-table-column>
-                    <el-table-column prop="state" label="状态" width="120">
+                    <el-table-column prop="productstatus" label="状态" width="80">
                     </el-table-column>
-                    <el-table-column prop="registerTime" label="更新时间" width="250">
+                    <el-table-column prop="updatetime" label="更新时间" width="180">
+                    </el-table-column>
+                    <el-table-column prop="updateuserid" label="更新者" width="100">
                     </el-table-column>
                     <el-table-column prop="edit" label="操作" width="96">
                         <template slot-scope="scope">
@@ -286,16 +288,23 @@
                     pageOn: '{{$pageOn}}',
                     tableData: [
                         @foreach($us as $key => $dat) {
-                            username: "{{$dat['username']}}", //商品名
-                            nickname: "{{$dat['nickname']}}", //商品分类
-                            email: "{{$dat['email']}}", //商品概要说明
-                            enabled: "{{$dat['enabled']}}", //店内价格
-                            role: "{{$dat['role']}}", //市场价格
-                            lastLoginTime: "{{$dat['lastLoginTime']}}", //数量
-                            popular: "{{$dat['lastLoginTime']}}" //热门商品
-                            state: "{{$dat['lastLoginTime']}}" //状态
-                            registerTime: "{{$dat['registerTime']}}", //更新时间
-                            edit: "{{$dat['edit']}}", //查看
+                            "name": "{{$dat['name']}}", //名字
+                            "categoryid": "{{$dat['categoryid']}}", //类别ID
+                            "explain": "{{$dat['explain']}}", //商品说明
+                            "generalexplain": "{{$dat['generalexplain']}}", //解释
+                            "discount": "{{$dat['discount']}}", //折扣
+                            "shopprice": "{{$dat['shopprice']}}", //商店价格
+                            "price": "{{$dat['price']}}", //价格
+                            "externalid": "{{$dat['externalid']}}", //
+                            "quantity": "{{$dat['quantity']}}", //量
+                            "hot": "{{$dat['hot']}}", //热
+                            "productstatus": "{{$dat['productstatus']}}", //产品状态
+                            "inventoryflag": "{{$dat['inventoryflag']}}", //库存标志
+                            "defaultimg": "{{$dat['defaultimg']}}", //商品图片
+                            "updatetime": "{{$dat['updatetime']}}", //更新时间
+                            "updateuserid": "{{$dat['updateuserid']}}", //更新者ID
+                            "createtime": "{{$dat['createtime']}}", //创建时间
+                            "createuserid": "{{$dat['createuserid']}}", //创建用户id
                         },
                         @endforeach
                     ],

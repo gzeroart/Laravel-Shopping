@@ -116,7 +116,7 @@
                                     type: 'success',
                                     duration: 1500,
                                     onClose: function() {
-                                        window.location = './user';
+                                        window.location = './productList';
                                     }
                                 });
                             } else {

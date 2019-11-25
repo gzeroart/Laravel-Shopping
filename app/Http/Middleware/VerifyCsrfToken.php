@@ -20,5 +20,7 @@ class VerifyCsrfToken extends Middleware
      */
     protected $except = [
         //
+        '/admin/product/icon', //上传的action
+        // '/product/icon', //上传的action
     ];
 }

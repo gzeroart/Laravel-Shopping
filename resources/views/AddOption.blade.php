@@ -172,53 +172,59 @@
                 return {
                     collapse: false,
                     dynamicValidateForm: {
-                        domains: [{
-                            value: ''
-                        }],
+                        domains: [],
                         name: ''
                     }
                 }
             },
             methods: {
                 submitForm(_this) {
-                    console.log(this.dynamicValidateForm);
-                    console.log(this.dynamicValidateForm.domains[0].value);
-                    $.ajax({
-                        type: "post",
-                        url: "option/add",
-                        dataType: "json",
-                        headers: {
-                            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                        },
-                        data: {
-                            name: addop.dynamicValidateForm.name,
-                            val: addop.dynamicValidateForm.domains
-                        },
-                        success: function(data) {
-                            if (data.code == 200) {
-                                addop.$message({
-                                    message: data.msg,
-                                    type: 'success',
-                                    duration: 1500,
-                                    onClose: function() {
-                                        window.location = './option';
-                                    }
-                                });
-                            } else {
-                                addop.$message({
-                                    message: data.msg,
-                                    type: 'warning',
+                    // console.log(this.dynamicValidateForm);
+                    // console.log(this.dynamicValidateForm.domains);
+                    // console.log(addop.dynamicValidateForm.domains.length);
+                    var v_value = '';
+                    if (addop.dynamicValidateForm.domains.length > 0) {
+                        v_value = addop.dynamicValidateForm.domains;
+                        console.log(v_value);
+                    }
+                    if (addop.dynamicValidateForm.name != '') {
+                        $.ajax({
+                            type: "post",
+                            url: "option/add",
+                            dataType: "json",
+                            headers: {
+                                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                            },
+                            data: {
+                                name: addop.dynamicValidateForm.name,
+                                val: v_value
+                            },
+                            success: function(data) {
+                                if (data.code == 200) {
+                                    addop.$message({
+                                        message: data.msg,
+                                        type: 'success',
+                                        duration: 1500,
+                                        onClose: function() {
+                                            window.location = './option';
+                                        }
+                                    });
+                                } else {
+                                    addop.$message({
+                                        message: data.msg,
+                                        type: 'warning',
+                                        duration: 3000
+                                    });
+                                }
+                            },
+                            error: function(XMLResponse) {
+                                addop.$message.error({
+                                    message: '服务器连接失败',
                                     duration: 3000
                                 });
                             }
-                        },
-                        error: function(XMLResponse) {
-                            addop.$message.error({
-                                message: '服务器连接失败',
-                                duration: 3000
-                            });
-                        }
-                    });
+                        });
+                    }
                 },
                 //侧边栏
                 handleOpen(key, keyPath) {
@@ -235,7 +241,9 @@
                 //删除
                 removeDomain(item) {
                     var index = this.dynamicValidateForm.domains.indexOf(item)
-                    if (index !== -0) {
+                    console.log(index);
+
+                    if (index >= 0) {
                         this.dynamicValidateForm.domains.splice(index, 1)
                     }
                 },
