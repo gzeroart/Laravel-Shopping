@@ -13,7 +13,6 @@
 
 ##############################后台登录#####################################
 //登录验证
-
 Route::post('/admin/logchect', "Admin\LoginController@userlogin");
 
 //登录页面
@@ -96,7 +95,6 @@ Route::get('/admin/option', 'Admin\GoodsController@option');
 //商品管理->option添加
 Route::get('/admin/addoption', 'Admin\GoodsController@addoption');
 
-
 //商品分类管理->添加
 Route::post('/admin/product/add', 'Admin\GoodsController@productadd');
 //商品分类管理->删除
@@ -106,13 +104,10 @@ Route::post('/admin/product/mod', 'Admin\GoodsController@productmod');
 //商品分类管理->图片上传
 Route::any('/admin/product/icon', 'Admin\GoodsController@upload');
 
-//productList
 //商品管理->商品管理
 Route::get('/admin/productList',  'Admin\GoodsController@productList');
-
 //商品管理->商品管理->商品分类管理
 Route::get('/admin/productCategoryList', 'Admin\GoodsController@goodssort');
-
 
 ##############################商品管理#####################################
 
@@ -120,7 +115,7 @@ Route::get('/admin', function () {
     //跳转redirect
     $isLogin = session()->get('isLogin'); //登录标识
     if ($isLogin) {
-        echo '这是后台首页';
+        return redirect('../admin/productList');
     } else {
         return redirect('../admin/login');
     }
@@ -130,20 +125,12 @@ Route::get('/', function () {
     echo "这是首页";
 });
 
-//商品分类管理->图片上传
-Route::any('/admin/111', 'Admin\GoodsController@upload2');
-
-// Route::get('/admin/111', function () {
-//     return view('111');
-// });
-
 ##############################电子钱包#####################################
 
-//评论管理->评论批量审核
+//电子钱包->电子钱包添加
 Route::post('/admin/pay/add', 'Admin\PayController@payadd');
 
 //电子钱包->电子钱包
 Route::get('/admin/pay', 'Admin\PayController@pay');
-
 
 ##############################路由结束#####################################
